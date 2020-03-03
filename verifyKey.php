@@ -21,7 +21,7 @@ if ($stmt = $con->prepare('SELECT id,password FROM accounts WHERE idUser= ?')){
 	// Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
 	$stmt->bind_param('s',$_GET['key']);
 	$stmt->execute();
-
+	$stmt->store_result();
 	if ($stmt->num_rows > 0) {
 		http_response_code(200);
 	}

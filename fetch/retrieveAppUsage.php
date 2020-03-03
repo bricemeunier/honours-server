@@ -1,10 +1,17 @@
 <?php
 
+session_start();
+// If the user is not logged in redirect to the login page...
+if (!isset($_SESSION['loggedin'])) {
+        header('Location: index.html');
+        exit();
+}
+
 include '../DatabaseConfig.php' ;
 
  $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
-
- $sql = "select timePeriod,app,timeUsed from usageStat order by date desc";
+ $key=$_SESSION['key'];
+ $sql = "select timePeriod,app,timeUsed from usageStat where idUser='$key' order by date desc";
  $result = mysqli_query($con,$sql);
  $data=[];
 for ($i=0; $i<mysqli_num_rows($result);$i++){
