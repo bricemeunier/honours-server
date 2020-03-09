@@ -9,7 +9,7 @@ $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 if ( mysqli_connect_errno() ) {
 	// If there is an error with the connection, stop the script and display the error.
 	die ();
-	header('Location: index.html?error=0'); 
+	header('Location: index.html?error=0');
 }
 
 // Now we check if the data from the login form was submitted, isset() will check if the data exists.
@@ -38,7 +38,7 @@ if ($stmt = $con->prepare('SELECT id, password,idUser FROM accounts WHERE userna
 			session_regenerate_id();
 			$_SESSION['loggedin'] = TRUE;
 			$_SESSION['key']=$key;
-			$_SESSION['name'] = $_POST['username'];
+			$_SESSION['name'] = ucfirst($_POST['username']);
 			$_SESSION['id'] = $id;
 			header('Location: home.php');
 		}

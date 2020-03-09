@@ -30,32 +30,40 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
 	<head>
 		<meta charset="utf-8">
 		<title>Profile Page</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 		<link href="style/style.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 	</head>
-	<body class="loggedin">
-		<nav class="navtop">
-			<div>
-				<h1 id="homePage">Monitoring Dashboard</h1>
-				<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
-				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
+	<body>
+		<nav>
+			<div class="nav-wrapper">
+				<a href="home.php" class="brand-logo">Monitoring Dashboard</a>
+				<a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+				<ul id="nav-mobile" class="right hide-on-med-and-down">
+					<li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
+					<li><a href="logout.php">Logout</a></li>
+				</ul>
 			</div>
 		</nav>
+		<ul class="sidenav" id="mobile-demo">
+			<li><a href="#"><?php echo $_SESSION['name']; ?></a></li>
+			<li><a href="logout.php">Logout</a></li>
+		</ul>
 		<div class="content">
-			<h2>Profile Page</h2>
 			<div>
-				<p>Your account details are below:</p>
-				<table>
+				<h5>Account details</h5>
+				<br>
+				<table id="accountDetails">
 					<tr>
-						<td>Username:</td>
+						<td>Username</td>
 						<td><?=$_SESSION['name']?></td>
 					</tr>
 					<tr>
-						<td>Private key:</td>
+						<td>Private key</td>
 						<td><?=$_SESSION['key']?></td>
 					</tr>
 					<tr>
-						<td>Email:</td>
+						<td>Email</td>
 						<td><?=$email?></td>
 					</tr>
 				</table>
