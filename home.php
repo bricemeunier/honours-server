@@ -10,9 +10,10 @@ if (!isset($_SESSION['loggedin'])) {
 <!DOCTYPE html>
 <html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
- 
+
 	<body class="loggedin">
 		<nav class="navtop">
 			<div>
@@ -34,8 +35,21 @@ if (!isset($_SESSION['loggedin'])) {
 			<ul></ul>
                 </div>
 		<div id="smsContainer" class="tabcontent">
-			<ul></ul>
+		    <div class="container-fluid">
+    			<div class="row">
+    				<div class="col-xs-3 b-r padding_bottom_70" >
+				      <div class="scrll_hide" id="numberList">
+				      </div>
+    				</div>
+
+   				 <div class="col-xs-9 b-r padding_bottom_70" >
+      					<div class="scrll_hide" id="discussion">
+					</div>
+    				</div>
+			</div>
+		    </div>
                 </div>
+
 		<div id="appUsageContainer" class="tabcontent">
 			<ul></ul>
                 </div>
@@ -43,22 +57,97 @@ if (!isset($_SESSION['loggedin'])) {
 		<script type="text/javascript">
 
  $(document).ready(function() {
-	/*
-    $("#locationButton").click(function(){
+
 	fetchData("/fetch/retrieveLocation.php","locationContainer");
-    });
-    $("#smsButton").click(function(){
-	fetchData("/fetch/retrieveSms.php","smsContainer");
-    });
-    $("#appButton").click(function(){
-	fetchData("/fetch/retrieveAppUsage.php","appUsageContainer");
-    });
-	*/
-	fetchData("/fetch/retrieveLocation.php","locationContainer");
-	fetchData("/fetch/retrieveSms.php","smsContainer");
+	fetchSmsContact();
 	fetchData("/fetch/retrieveAppUsage.php","appUsageContainer");
 	document.getElementById('locationButton').click();
+
 });
+
+function fetchSmsContact(){
+	$.ajax({    //create an ajax request to display.php
+	        type: "GET",
+        	url: "/fetch/retrieveSmsContact.php",
+        	dataType: "html",   //expect html to be returned
+        	success: function(result){
+                	jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+                	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+                        	jq_obj = eval (jq_json_obj);
+
+                        	//Convert back to an array
+                        	jq_array = [];
+                        	for(elem in jq_obj){
+                                	jq_array.push(jq_obj[elem]);
+                        	}
+                       		addContactToSmsContainer(jq_array);
+                	}
+        	}
+   	});
+}
+
+function addContactToSmsContainer(data,id){
+        for (var i=0;i<data.length;i++){
+                row=data[i];
+		var newP=document.createElement("p");
+                var text=document.createTextNode(row[0]);
+		newP.appendChild(text);
+                var div=document.getElementById("numberList");
+                var newDiv=document.createElement("div");
+		if (i==0){
+			newDiv.setAttribute("id",row[0]+" current");
+		}
+		else {
+			newDiv.setAttribute("id",row[0]);
+                }
+		newDiv.setAttribute("onclick","getMessage("+row[0]+")");
+		newDiv.appendChild(newP)
+                div.appendChild(newDiv);
+        }
+}
+
+
+function getMessage(id){
+        $.ajax({    //create an ajax request to display.php
+                type: "GET",
+                url: "/fetch/retrieveSmsMessages.php?address="+id,
+                dataType: "html",   //expect html to be returned
+                success: function(result){
+                        jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-$
+
+                        if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] obj$
+                                jq_obj = eval (jq_json_obj);
+
+                                //Convert back to an array
+                                jq_array = [];
+                                for(elem in jq_obj){
+                                        jq_array.push(jq_obj[elem]);
+                                }
+                                addMessageToHTML(jq_array);
+                        }
+                }
+        });
+}
+
+function addMessageToHTML(data){
+        var sec=document.getElementById("discussion");
+	sec.innerHTML="";
+        for (var i=0;i<data.length;i++){
+                row=data[data.length-i-1];
+                var text=document.createTextNode(row[1]);
+                var newDiv=document.createElement("div");
+		if (row[0]==0){
+                	newDiv.setAttribute("class","bubble sender");
+                }
+		else {
+			newDiv.setAttribute("class","bubble recipient");
+		}
+                newDiv.appendChild(text);
+                sec.appendChild(newDiv);
+        }
+}
+
 
 function fetchData(urlToFetch,idElement){
    $.ajax({    //create an ajax request to display.php
