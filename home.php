@@ -114,36 +114,41 @@ function getAppUsageFromDate(d){
           jq_array.push(jq_obj[elem]);
       	}
         var data=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        var detailedData=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         jq_array.forEach(function(dataHour) {
           var tmp=d;
           var i=0;
+
           while (Math.abs(tmp-parseInt(dataHour[0][0]))>3599999 && i<24){
             tmp+=3600000;
             i++;
           }
           if (i<24){
             var total_min=0;
+            var tmpTab=[];
             for (var j=0;j<dataHour.length;j++){
               total_min+=parseInt(dataHour[j][2]);
+              tmpTab[j]=[dataHour[j][1],dataHour[j][2]];
             }
             total_min=Math.floor(total_min/60);
             if (total_min<1) total_min=1;
             if (total_min>60) total_min=60;
+            detailedData[i]=tmpTab;
             data[i]=total_min;
           }
         });
-        makeChart(data);
+        makeChart(data,detailedData);
     	}
     },
     error: function(){
 
-      makeChart([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+      makeChart([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],null);
     }
   });
 
 }
 
-function makeChart(data){
+function makeChart(data, detailedData){
 
   if(window.myChart != undefined) {
     window.myChart.destroy();
@@ -170,6 +175,43 @@ function makeChart(data){
           }]
       },
       options: {
+        legend: {
+          display: false
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem, data) {
+              var result="Time spent using the phone: "+
+              data['datasets'][0]['data'][tooltipItem['index']]+" min";
+              return result;
+            },
+            afterLabel: function(tooltipItem, data) {
+              var d=detailedData[tooltipItem.index];
+              var result="\n";
+              for (var i=0;i<d.length;i++) {
+                if (d[i]!=0){
+                  var t=parseInt(d[i][1]);
+                  if (t>59){
+                    var s=t-Math.floor(t/60)*60;
+                    if (s<10){
+                      result+=d[i][0]+" "+Math.floor(t/60)+" min 0"+s+" sec\n";
+                    }
+                    else {
+                      result+=d[i][0]+" "+Math.floor(t/60)+" min "+s+" sec\n";
+                    }
+                  }
+                  else {
+                    var sec="";
+                    if (parseInt(d[i][1])<10) sec="0"+d[i][1]+" sec\n";
+                    else sec=d[i][1]+" sec\n";
+                    result+=d[i][0]+" "+sec;
+                  }
+                }
+              }
+              return result;
+            }
+          }
+        },
         scales: {
           yAxes: [{
             ticks: {

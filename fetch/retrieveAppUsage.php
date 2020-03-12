@@ -17,7 +17,7 @@ $sql = "select timePeriod,app,timeUsed from usageStat where idUser='$key' order 
 $result = mysqli_query($con,$sql);
 $data=[];
 
-if ($stmt = $con->prepare('select timePeriod,app,timeUsed from usageStat where idUser=? AND timePeriod > ? AND timePeriod < ? AND timeUsed > "0" order by date asc')){
+if ($stmt = $con->prepare('select timePeriod,app,timeUsed from usageStat where idUser=? AND timePeriod > ? AND timePeriod < ? AND timeUsed > "0" order by timePeriod asc,convert(timeUsed,decimal) desc')){
   // Bind parameters to avoid sql injection
   $stmt->bind_param('sss',$key,$d1,$d2);
   $stmt->execute();
