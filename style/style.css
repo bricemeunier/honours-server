@@ -1,5 +1,6 @@
 /* Style the tab */
 .tab {
+  width: 100%;
   overflow: hidden;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
@@ -56,6 +57,10 @@ body {
 	margin: auto;
 }
 
+nav {
+  background-color: #3274d6;
+}
+
 #main {
     background-color: #f3f4f7;
 }
@@ -63,6 +68,10 @@ body {
 @media screen and (max-width: 992px) {
   body {
     width:100%;
+  }
+
+  .b-r{
+    height: 95vh;
   }
 
   #accountDetails {
@@ -78,7 +87,7 @@ body {
 }
 
 .b-r{
-  height: 100vh;
+  height: 75vh;
   overflow: hidden;
 }
 
@@ -118,8 +127,7 @@ html {
 
 #discussion {
 	max-width: 600px;
-	margin: 0 auto;
-
+	margin: 2% 5% auto;
 	display: flex;
 	flex-flow: column wrap;
 }
@@ -138,7 +146,7 @@ html {
 }
 #discussion > .bubble.recipient {
 	align-self: flex-end;
-	background-color: #efefef;
+	background-color: #c8c2c2;
 }
 
 #discussion > .bubble.sender.first { border-bottom-left-radius: 0.1em; }
@@ -158,4 +166,8 @@ html {
 .collection-item:hover {
 	cursor: pointer;
 	background-color:#d7d2d2;
+}
+
+#choosenDate {
+  width: auto;
 }

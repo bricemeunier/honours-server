@@ -25,14 +25,14 @@ if (!isset($_SESSION['loggedin'])) {
         <a href="#" class="brand-logo">Monitoring Dashboard</a>
         <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
-          <li><a href="logout.php">Logout</a></li>
+          <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
+          <li><a href="logout.php"><b>Logout</b></a></li>
         </ul>
       </div>
     </nav>
     <ul class="sidenav" id="mobile-demo">
-      <li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
-      <li><a href="logout.php">Logout</a></li>
+      <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
+      <li><a href="logout.php"><b>Logout</b></a></li>
     </ul>
 
     <div id="main">
@@ -56,33 +56,133 @@ if (!isset($_SESSION['loggedin'])) {
                 </div>
               </div>
               <div class="col-xs-9 b-r" >
-                <div class="scrll_hide" id="discussion"></div>
+                <div class="scrll_hide">
+                  <div id="discussion"></div>
+                </div>
               </div>
   			    </div>
   		    </div>
       </div>
 
   		<div id="appUsageContainer" class="tabcontent">
-  			<ul></ul>
+  			<form id="pickDate" method="get">
+          <input type="date" id="choosenDate" name="choosenDate"/>
+          <input class="submit" type="submit" value="Send" />
+        </form>
       </div>
-
     </div>
   </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script type="text/javascript">
 
-
+// jquery loading when page starts
 $(document).ready(function() {
+
   $('.sidenav').sidenav();
 	fetchData("fetch/retrieveLocation.php","locationContainer");
 	fetchSmsContact();
-	fetchData("fetch/retrieveAppUsage.php","appUsageContainer");
 	document.getElementById('locationButton').click();
+  $('#pickDate').submit(function () {
+    var datePicked = document.getElementById("choosenDate").value;
+    if (datePicked!=""){
+      var dt=new Date(datePicked);
+      getAppUsageFromDate(dt.getTime());
+    }
+    return false;
+  });
 
 });
 
+function getAppUsageFromDate(d){
+
+  $.ajax({    //create an ajax request to display.php
+    type: "GET",
+    url: "fetch/retrieveAppUsage.php?date="+d,
+    dataType: "html",   //expect html to be returned
+    success: function(result){
+      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+    	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+      	jq_obj = eval (jq_json_obj);
+
+      	//Convert back to an array
+      	jq_array = [];
+      	for(elem in jq_obj){
+          jq_array.push(jq_obj[elem]);
+      	}
+        var data=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        jq_array.forEach(function(dataHour) {
+          var tmp=d;
+          var i=0;
+          while (Math.abs(tmp-parseInt(dataHour[0][0]))>3599999 && i<24){
+            tmp+=3600000;
+            i++;
+          }
+          if (i<24){
+            var total_min=0;
+            for (var j=0;j<dataHour.length;j++){
+              total_min+=parseInt(dataHour[j][2]);
+            }
+            total_min=Math.floor(total_min/60);
+            if (total_min<1) total_min=1;
+            if (total_min>60) total_min=60;
+            data[i]=total_min;
+          }
+        });
+        makeChart(data);
+    	}
+    },
+    error: function(){
+
+      makeChart([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    }
+  });
+
+}
+
+function makeChart(data){
+
+  if(window.myChart != undefined) {
+    window.myChart.destroy();
+  }
+  else {
+    var canvas = document.createElement('canvas');
+    canvas.id = "myChart";
+    var parent=document.getElementById("appUsageContainer");
+    parent.appendChild(canvas);
+  }
+
+  var ctx = document.getElementById('myChart').getContext('2d');
+  window.myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: ['00h', '01h', '02h', '03h', '04h', '05h', '06h', '07h', '08h', '09h', '10h',
+           '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'],
+          datasets: [{
+              label: 'Time spent using the phone',
+              data: data,
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              suggestedMax:60,
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+  });
+}
+
+// fetch all the contact numbers
 function fetchSmsContact(){
 	$.ajax({    //create an ajax request to display.php
     type: "GET",
@@ -106,6 +206,7 @@ function fetchSmsContact(){
   });
 }
 
+// Add contact numbers to HTML
 function addContactToSmsContainer(data,id){
 
   for (var i=0;i<data.length;i++){
@@ -133,7 +234,7 @@ function addContactToSmsContainer(data,id){
 
 }
 
-
+// fetch all messages from a contact number
 function getMessage(id){
 
   var previousId=document.getElementsByClassName('active')[0].id;
@@ -142,7 +243,7 @@ function getMessage(id){
   previousActiveDiv.setAttribute("class","collection-item");
 
   document.getElementById(id).setAttribute("class","collection-item active");
-  console.log(id);
+
   $.ajax({    //create an ajax request to display.php
     type: "GET",
     url: "fetch/retrieveSmsMessages.php?address="+id,
@@ -164,6 +265,7 @@ function getMessage(id){
   });
 }
 
+// add messages from a contact number to HTML
 function addMessageToHTML(data){
 
   var sec=document.getElementById("discussion");
@@ -213,6 +315,20 @@ function fetchData(urlToFetch,idElement){
    });
 }
 
+
+function addToHTML(data,id){
+	for (var i=0;i<data.length;i++){
+		row=data[i];
+		var text=row[0]+"  -  "+row[1]+" , "+row[2];
+		var div=document.getElementById(id);
+		var newLi=document.createElement("li");
+		text=document.createTextNode(text);
+		newLi.appendChild(text)
+		div.appendChild(newLi);
+	}
+}
+
+// Manage the nav bar containing the monitored information
 function openTabs(evt,tab) {
 	var i, tabcontent, tablinks;
   	tabcontent = document.getElementsByClassName("tabcontent");
@@ -227,17 +343,6 @@ function openTabs(evt,tab) {
   	evt.currentTarget.className += " current";
 }
 
-function addToHTML(data,id){
-	for (var i=0;i<data.length;i++){
-		row=data[i];
-		var text=row[0]+"  -  "+row[1]+" , "+row[2];
-		var div=document.getElementById(id);
-		var newLi=document.createElement("li");
-		text=document.createTextNode(text);
-		newLi.appendChild(text)
-		div.appendChild(newLi);
-	}
-}
 
 </script>
 </html>

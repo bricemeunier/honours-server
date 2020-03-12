@@ -1,50 +1,17 @@
 <?DOCTYPE html>
 <html>
+
 	<head>
+		
 		<meta charset="utf-8">
 		<title>Login</title>
 		<link rel="stylesheet" href="style/styleLogin.css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-	</head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script type="text/javascript">
-	$(document).ready(function(){
-		var queryString=window.location.search;
-		var urlParams=new URLSearchParams(queryString);
-		if (urlParams.get("error")=="1"){
-			var doc=document.getElementById("error");
-			var errMessage="<h3>Username or password incorrect</h3>";
-			doc.innerHTML=errMessage;
-		}
-		if (urlParams.get("error")=="0"){
-                        var doc=document.getElementById("error");
-                        var errMessage="<h3>Error, please try again</h3>";
-                        doc.innerHTML=errMessage;
-                }
-		if (urlParams.get("error")=="00"){
-                        var doc=document.getElementById("errorRegistration");
-                        var errMessage="<h3>Error, please try again</h3>";
-                        doc.innerHTML=errMessage;
-                }
-		if (urlParams.get("error")=="2"){
-                        var doc=document.getElementById("errorRegistration");
-                        var errMessage="<h3>Username or password incorrect</h3>";
-                        doc.innerHTML=errMessage;
-                }
-		if (urlParams.get("error")=="3"){
-                        var doc=document.getElementById("errorRegistration");
-                        var errMessage="<h3>Username already exists</h3>";
-                        doc.innerHTML=errMessage;
-                }
-		if (user=urlParams.get("registration")){
-                        var doc=document.getElementById("success");
-                        var errMessage="<h3>Registration completed, please login</h3>";
-                        doc.innerHTML=errMessage;
-                }
 
-	});
-</script>
+	</head>
+
 	<body>
+
 		<div class="login">
 			<h1>Login</h1>
 			<h3 id="error"></h3>
@@ -61,8 +28,9 @@
 				<input type="submit" value="Login">
 			</form>
 		</div>
+
 		<div class="register">
-                	<h1>Register</h1>
+      <h1>Register</h1>
 			<h3 id="errorRegistration"></h3>
 			<form action="register.php" method="post" autocomplete="off">
 				<label for="username">
@@ -79,6 +47,45 @@
 				<input type="email" name="email" placeholder="Email" id="email" required>
 				<input type="submit" value="Register">
 			</form>
-                </div>
+    </div>
 	</body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var queryString=window.location.search;
+			var urlParams=new URLSearchParams(queryString);
+			if (urlParams.get("error")=="1"){
+				var doc=document.getElementById("error");
+				var errMessage="<h3>Username or password incorrect</h3>";
+				doc.innerHTML=errMessage;
+			}
+			if (urlParams.get("error")=="0"){
+	                        var doc=document.getElementById("error");
+	                        var errMessage="<h3>Error, please try again</h3>";
+	                        doc.innerHTML=errMessage;
+	                }
+			if (urlParams.get("error")=="00"){
+	                        var doc=document.getElementById("errorRegistration");
+	                        var errMessage="<h3>Error, please try again</h3>";
+	                        doc.innerHTML=errMessage;
+	                }
+			if (urlParams.get("error")=="2"){
+	                        var doc=document.getElementById("errorRegistration");
+	                        var errMessage="<h3>Username or password incorrect</h3>";
+	                        doc.innerHTML=errMessage;
+	                }
+			if (urlParams.get("error")=="3"){
+	                        var doc=document.getElementById("errorRegistration");
+	                        var errMessage="<h3>Username already exists</h3>";
+	                        doc.innerHTML=errMessage;
+	                }
+			if (user=urlParams.get("registration")){
+	                        var doc=document.getElementById("success");
+	                        var errMessage="<h3>Registration completed, please login</h3>";
+	                        doc.innerHTML=errMessage;
+	                }
+
+		});
+	</script>
 </html>
