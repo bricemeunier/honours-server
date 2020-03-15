@@ -28,14 +28,6 @@
   background-color: #ccc;
 }
 
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-top: none;
-}
-
 h5 {
   text-align: center;
 }
@@ -68,6 +60,7 @@ nav {
 @media screen and (max-width: 992px) {
   body {
     width:100%;
+    min-height:100vh;
   }
 
   .b-r{
@@ -170,4 +163,22 @@ html {
 
 #choosenDate {
   width: auto;
+}
+
+#mapid {
+  height:60vh;
+  width: 100%;
+}
+
+.leaflet-control-attribution {
+  display:none;
+}
+
+form {
+  width:fit-content;
+  margin: 1% 0% 1% 10%;
+}
+
+.datepicker-date-display {
+  background-color: #3274d6;
 }

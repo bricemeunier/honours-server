@@ -16,6 +16,7 @@ if (!isset($_SESSION['loggedin'])) {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
 
   </head>
 
@@ -38,42 +39,46 @@ if (!isset($_SESSION['loggedin'])) {
     <div id="main">
 
   		<div class="tab">
-  			<button id="locationButton" class="tablinks" onclick="openTabs(event, 'locationContainer')">Location</button>
-    			<button id="smsButton" class="tablinks" onclick="openTabs(event, 'smsContainer')">SMS</button>
-    			<button id="appButton" class="tablinks" onclick="openTabs(event, 'appUsageContainer')">App Usage</button>
+        <button id="locationButton" onclick="openTabs(event,'#locationContainer')">Location</button>
+        <button id="smsButton" onclick="openTabs(event,'#smsContainer')">SMS</button>
+        <button id="appButton" onclick="openTabs(event,'#appUsageContainer')">App Usage</button>
   		</div>
+      <div id="monitoredContent">
+        <div id="locationContainer">
+          <form id="selectDate" method="get">
+            <input type="text" class="locationDatepicker"/>
+          </form>
+          <div id="mapid"></div>
+        </div>
 
-      <div id="locationContainer" class="tabcontent">
-  		    <ul></ul>
-      </div>
-
-      <div id="smsContainer" class="tabcontent">
-  		    <div class="container-fluid">
-      			<div class="row">
-              <div class="col-xs-3 b-r" >
-                <div class="scrll_hide">
-                  <div class="collection" id="numberList"></div>
+        <div id="smsContainer">
+    		    <div class="container-fluid">
+        			<div class="row">
+                <div class="col-xs-3 b-r" >
+                  <div class="scrll_hide">
+                    <div class="collection" id="numberList"></div>
+                  </div>
                 </div>
-              </div>
-              <div class="col-xs-9 b-r" >
-                <div class="scrll_hide">
-                  <div id="discussion"></div>
+                <div class="col-xs-9 b-r" >
+                  <div class="scrll_hide">
+                    <div id="discussion"></div>
+                  </div>
                 </div>
-              </div>
-  			    </div>
-  		    </div>
-      </div>
+    			    </div>
+    		    </div>
+        </div>
 
-  		<div id="appUsageContainer" class="tabcontent">
-  			<form id="pickDate" method="get">
-          <input type="date" id="choosenDate" name="choosenDate"/>
-          <input class="submit" type="submit" value="Send" />
-        </form>
+    		<div id="appUsageContainer">
+    			<form id="pickDate" method="get">
+            <input type="text" class="appUsageDatepicker"/>
+          </form>
+        </div>
       </div>
     </div>
   </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script type="text/javascript">
@@ -82,20 +87,104 @@ if (!isset($_SESSION['loggedin'])) {
 $(document).ready(function() {
 
   $('.sidenav').sidenav();
-	fetchData("fetch/retrieveLocation.php","locationContainer");
 	fetchSmsContact();
-	document.getElementById('locationButton').click();
-  $('#pickDate').submit(function () {
-    var datePicked = document.getElementById("choosenDate").value;
-    if (datePicked!=""){
-      var dt=new Date(datePicked);
-      getAppUsageFromDate(dt.getTime());
-    }
-    return false;
+  var mymap=null;
+  //set value to all input date
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1;
+  var yyyy = today.getFullYear();
+  getLocationFromDate(new Date(yyyy+"/"+"0"+mm+"/"+dd).getTime());
+  document.getElementsByClassName("locationDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
+  getAppUsageFromDate(new Date(yyyy+"-"+"0"+mm+"-"+dd).getTime());
+  document.getElementsByClassName("appUsageDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
+
+  $(".locationDatepicker").datepicker({
+      format: "yyyy/mm/dd",
+      autoClose: true,
+      onSelect : function(time){
+        var dt=new Date(time);
+        getLocationFromDate(dt.getTime());
+      }
   });
+
+  $(".appUsageDatepicker").datepicker({
+      format: "yyyy/mm/dd",
+      autoClose: true,
+      onSelect : function(time){
+        var dt=new Date(time);
+        getAppUsageFromDate(dt.getTime());
+      }
+  });
+
+	document.getElementById('locationButton').click();
 
 });
 
+function makeMap(data){
+
+  if (L.DomUtil.get('mapid') != null){
+    L.DomUtil.get('mapid')._leaflet_id = null;
+  }
+
+  mymap = L.map('mapid').setView([51.505, -0.09], 13);
+
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 20,
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+	}).addTo(mymap);
+  var arrayOfLatLngs=[];
+  if (data !=undefined) {
+    data.forEach(function(onePlace) {
+      arrayOfLatLngs.push([onePlace[0][0],onePlace[0][1]]);
+      L.marker([onePlace[0][0],onePlace[0][1]]).addTo(mymap).
+        bindPopup(onePlace[1]);
+    });
+  	L.popup();
+    var bounds = new L.LatLngBounds(arrayOfLatLngs);
+    mymap.fitBounds(bounds);
+
+  }
+}
+//fetch locations from a given day
+function getLocationFromDate(d){
+
+  $.ajax({    //create an ajax request to display.php
+    type: "GET",
+    url: "fetch/retrieveLocation.php?date="+d,
+    dataType: "html",   //expect html to be returned
+    success: function(result){
+      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+    	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+      	jq_obj = eval (jq_json_obj);
+
+      	//Convert back to an array
+      	jq_array = [];
+      	for(elem in jq_obj){
+          jq_array.push(jq_obj[elem]);
+      	}
+
+        jq_array.forEach(function(elem) {
+          var str="";
+          elem[1].forEach(function(res) {
+            str+="<dt>"+  res+"</dt>";
+          });
+          elem[1]=str;
+        });
+        makeMap(jq_array);
+    	}
+    },
+    error: function(){
+      makeMap();
+    }
+  });
+
+}
+
+//fetch application usage statistics from a given date
 function getAppUsageFromDate(d){
 
   $.ajax({    //create an ajax request to display.php
@@ -148,6 +237,7 @@ function getAppUsageFromDate(d){
 
 }
 
+//create chart for appUsage page
 function makeChart(data, detailedData){
 
   if(window.myChart != undefined) {
@@ -334,55 +424,12 @@ function addMessageToHTML(data){
   $('.tooltipped').tooltip();
 }
 
-
-function fetchData(urlToFetch,idElement){
-   $.ajax({    //create an ajax request to display.php
-        type: "GET",
-        url: urlToFetch,
-        dataType: "html",   //expect html to be returned
-        success: function(result){
-                jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compatible
-
-                if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
-                        jq_obj = eval (jq_json_obj);
-
-                        //Convert back to an array
-                        jq_array = [];
-                        for(elem in jq_obj){
-                                jq_array.push(jq_obj[elem]);
-                        }
-			addToHTML(jq_array,idElement);
-		}
-	}
-   });
-}
-
-
-function addToHTML(data,id){
-	for (var i=0;i<data.length;i++){
-		row=data[i];
-		var text=row[0]+"  -  "+row[1]+" , "+row[2];
-		var div=document.getElementById(id);
-		var newLi=document.createElement("li");
-		text=document.createTextNode(text);
-		newLi.appendChild(text)
-		div.appendChild(newLi);
-	}
-}
-
 // Manage the nav bar containing the monitored information
-function openTabs(evt,tab) {
-	var i, tabcontent, tablinks;
-  	tabcontent = document.getElementsByClassName("tabcontent");
-  	for (i = 0; i < tabcontent.length; i++) {
-    		tabcontent[i].style.display = "none";
-  	}
-  	tablinks = document.getElementsByClassName("tablinks");
-  	for (i = 0; i < tablinks.length; i++) {
-    		tablinks[i].className = tablinks[i].className.replace(" current", "");
-  	}
-  	document.getElementById(tab).style.display = "block";
-  	evt.currentTarget.className += " current";
+function openTabs(e,div) {
+	$("#monitoredContent").children().hide();
+  $(div).show();
+  $(".tab button").css("background-color","initial");
+  e.currentTarget.style="background-color: #ccc;";
 }
 
 

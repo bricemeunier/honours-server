@@ -13,8 +13,6 @@ $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 $key=$_SESSION['key'];
 $d1=$_GET['date']-1;
 $d2=$d1+86400000;
-$sql = "select timePeriod,app,timeUsed from usageStat where idUser='$key' order by date desc";
-$result = mysqli_query($con,$sql);
 $data=[];
 
 if ($stmt = $con->prepare('select timePeriod,app,timeUsed from usageStat where idUser=? AND timePeriod > ? AND timePeriod < ? AND timeUsed > "0" order by timePeriod asc,convert(timeUsed,decimal) desc')){
