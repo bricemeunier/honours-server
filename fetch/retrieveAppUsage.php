@@ -10,6 +10,11 @@ if (!isset($_SESSION['loggedin'])) {
 include '../DatabaseConfig.php' ;
 $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 
+// If there is an error with the connection, stop the script and display the error.
+ if ( mysqli_connect_errno() ) {
+   http_response_code(500);
+ }
+
 $key=$_SESSION['key'];
 $d1=$_GET['date']-1;
 $d2=$d1+86400000;
@@ -57,10 +62,10 @@ if ($stmt = $con->prepare('select timePeriod,app,timeUsed from usageStat where i
   	echo json_encode($data);
   }
   else {
-    http_response_code(404);
+    http_response_code(204);
   }
 }
 else {
-  http_response_code(404);
+  http_response_code(500);
 }
 ?>

@@ -21,20 +21,22 @@ if (!isset($_SESSION['loggedin'])) {
   </head>
 
   <body>
-    <nav>
-      <div class="nav-wrapper">
-        <a href="#" class="brand-logo">Monitoring Dashboard</a>
-        <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
-          <li><a href="logout.php"><b>Logout</b></a></li>
-        </ul>
-      </div>
-    </nav>
-    <ul class="sidenav" id="mobile-demo">
-      <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
-      <li><a href="logout.php"><b>Logout</b></a></li>
-    </ul>
+    <div id="naviguation">
+      <nav>
+        <div class="nav-wrapper">
+          <a href="#" class="brand-logo">Monitoring Dashboard</a>
+          <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
+            <li><a href="logout.php"><b>Logout</b></a></li>
+          </ul>
+        </div>
+      </nav>
+      <ul class="sidenav" id="mobile-demo">
+        <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
+        <li><a href="logout.php"><b>Logout</b></a></li>
+      </ul>
+    </div>
 
     <div id="main">
 
@@ -86,35 +88,110 @@ if (!isset($_SESSION['loggedin'])) {
 // jquery loading when page starts
 $(document).ready(function() {
 
+  //responsive navbar
   $('.sidenav').sidenav();
-	fetchSmsContact();
-  var mymap=null;
-  //set value to all input date
+
+  //div fit window on load
+  //should be set with resize as $(window).on('load resize',...)
+  //but .on("load") does not work in firefox
+  var body=$("body").height();
+  var nav=$("#naviguation").height();
+  $("#main").height(body-nav-(body*0.01));
+  var main=$("#main").height();
+  var tab=$(".tab").height();
+  $("#monitoredContent").height(main-tab-(main*0.01)-1);
+  var moni=$("#monitoredContent").height();
+  var datePicker=null;
+
+  //fit window on resize
+  $(window).on('resize',function () {
+    body=$("body").height();
+    nav=$("#naviguation").height();
+    $("#main").height(body-nav-(body*0.01));
+    main=$("#main").height();
+    tab=$(".tab").height();
+    $("#monitoredContent").height(main-tab-(main*0.01)-1);
+    moni=$("#monitoredContent").height();
+    if (datePicker!=null){
+      datePicker=$("#selectDate").height();
+      $("#mapid").height(moni-datePicker-(moni*0.01)-5);
+    }
+  });
+
+  //get today's date
   var today = new Date();
   var dd = today.getDate();
   var mm = today.getMonth()+1;
   var yyyy = today.getFullYear();
-  getLocationFromDate(new Date(yyyy+"/"+"0"+mm+"/"+dd).getTime());
-  document.getElementsByClassName("locationDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
-  getAppUsageFromDate(new Date(yyyy+"-"+"0"+mm+"-"+dd).getTime());
-  document.getElementsByClassName("appUsageDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
 
-  $(".locationDatepicker").datepicker({
-      format: "yyyy/mm/dd",
-      autoClose: true,
-      onSelect : function(time){
-        var dt=new Date(time);
-        getLocationFromDate(dt.getTime());
-      }
+  //sms page loading on click
+  $("#smsButton").on('click',function() {
+
+    //empty the two other divs
+    $("#mapid").empty();
+    if(window.myChart != undefined) {
+      window.myChart.destroy();
+    }
+
+    if (datePicker!=null){
+      datePicker=null;
+    }
+  	fetchSmsContact();
   });
 
-  $(".appUsageDatepicker").datepicker({
-      format: "yyyy/mm/dd",
-      autoClose: true,
-      onSelect : function(time){
-        var dt=new Date(time);
-        getAppUsageFromDate(dt.getTime());
-      }
+  //location page on click
+  $("#locationButton").on('click',function() {
+
+    //empty the two other divs
+    $("#numberList").empty();
+    $("#discussion").empty();
+    if(window.myChart != undefined) {
+      window.myChart.destroy();
+    }
+
+    datePicker=$("#selectDate").height();
+    $("#mapid").height(moni-datePicker-(moni*0.01)-5);
+    //set value to datepicker
+    getLocationFromDate(new Date(yyyy+"/"+"0"+mm+"/"+dd).getTime());
+    document.getElementsByClassName("locationDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
+
+    //set datepicker
+    $(".locationDatepicker").datepicker({
+        format: "yyyy/mm/dd",
+        autoClose: true,
+        onSelect : function(time){
+          var dt=new Date(time);
+          getLocationFromDate(dt.getTime());
+        }
+    });
+  });
+
+  //app usage page on onclick
+  $("#appButton").on('click',function() {
+
+    //empty the two other divs
+    $("#mapid").empty();
+    $("#numberList").empty();
+    $("#discussion").empty();
+
+    if (datePicker!=null){
+      datePicker=null;
+    }
+
+    //set value to datepicker
+    getAppUsageFromDate(new Date(yyyy+"-"+"0"+mm+"-"+dd).getTime());
+    document.getElementsByClassName("appUsageDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
+
+    //set datepicker
+    $(".appUsageDatepicker").datepicker({
+        format: "yyyy/mm/dd",
+        autoClose: true,
+        onSelect : function(time){
+          var dt=new Date(time);
+          getAppUsageFromDate(dt.getTime());
+        }
+    });
+
   });
 
 	document.getElementById('locationButton').click();
@@ -123,11 +200,13 @@ $(document).ready(function() {
 
 function makeMap(data){
 
-  if (L.DomUtil.get('mapid') != null){
-    L.DomUtil.get('mapid')._leaflet_id = null;
+  //create a new map each time
+  if (window.mymap != undefined) {
+    window.mymap.remove();
   }
 
-  mymap = L.map('mapid').setView([51.505, -0.09], 13);
+  //set view in Aberdeen, UK
+  window.mymap = L.map('mapid').setView([57.149, -2.1], 13);
 
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 20,
@@ -144,8 +223,7 @@ function makeMap(data){
     });
   	L.popup();
     var bounds = new L.LatLngBounds(arrayOfLatLngs);
-    mymap.fitBounds(bounds);
-
+    mymap.fitBounds(bounds,{maxZoom:13});
   }
 }
 //fetch locations from a given day
@@ -156,26 +234,30 @@ function getLocationFromDate(d){
     url: "fetch/retrieveLocation.php?date="+d,
     dataType: "html",   //expect html to be returned
     success: function(result){
-      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+      if (result!=undefined) {
+        jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
 
-    	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
-      	jq_obj = eval (jq_json_obj);
+        if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+        	jq_obj = eval (jq_json_obj);
 
-      	//Convert back to an array
-      	jq_array = [];
-      	for(elem in jq_obj){
-          jq_array.push(jq_obj[elem]);
-      	}
-
-        jq_array.forEach(function(elem) {
-          var str="";
-          elem[1].forEach(function(res) {
-            str+="<dt>"+  res+"</dt>";
+        	//Convert back to an array
+        	jq_array = [];
+        	for(elem in jq_obj){
+            jq_array.push(jq_obj[elem]);
+        	}
+          jq_array.forEach(function(elem) {
+            var str="";
+            elem[1].forEach(function(res) {
+              str+="<dt>"+  res+"</dt>";
+            });
+            elem[1]=str;
           });
-          elem[1]=str;
-        });
-        makeMap(jq_array);
+          makeMap(jq_array);
+        }
     	}
+      else {
+        makeMap();
+      }
     },
     error: function(){
       makeMap();
@@ -192,42 +274,47 @@ function getAppUsageFromDate(d){
     url: "fetch/retrieveAppUsage.php?date="+d,
     dataType: "html",   //expect html to be returned
     success: function(result){
-      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+      if (result!=undefined){
+        jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
 
-    	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
-      	jq_obj = eval (jq_json_obj);
+      	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+        	jq_obj = eval (jq_json_obj);
 
-      	//Convert back to an array
-      	jq_array = [];
-      	for(elem in jq_obj){
-          jq_array.push(jq_obj[elem]);
-      	}
-        var data=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        var detailedData=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        jq_array.forEach(function(dataHour) {
-          var tmp=d;
-          var i=0;
+        	//Convert back to an array
+        	jq_array = [];
+        	for(elem in jq_obj){
+            jq_array.push(jq_obj[elem]);
+        	}
+          var data=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+          var detailedData=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+          jq_array.forEach(function(dataHour) {
+            var tmp=d;
+            var i=0;
 
-          while (Math.abs(tmp-parseInt(dataHour[0][0]))>3599999 && i<24){
-            tmp+=3600000;
-            i++;
-          }
-          if (i<24){
-            var total_min=0;
-            var tmpTab=[];
-            for (var j=0;j<dataHour.length;j++){
-              total_min+=parseInt(dataHour[j][2]);
-              tmpTab[j]=[dataHour[j][1],dataHour[j][2]];
+            while (Math.abs(tmp-parseInt(dataHour[0][0]))>3599999 && i<24){
+              tmp+=3600000;
+              i++;
             }
-            total_min=Math.floor(total_min/60);
-            if (total_min<1) total_min=1;
-            if (total_min>60) total_min=60;
-            detailedData[i]=tmpTab;
-            data[i]=total_min;
-          }
-        });
-        makeChart(data,detailedData);
-    	}
+            if (i<24){
+              var total_min=0;
+              var tmpTab=[];
+              for (var j=0;j<dataHour.length;j++){
+                total_min+=parseInt(dataHour[j][2]);
+                tmpTab[j]=[dataHour[j][1],dataHour[j][2]];
+              }
+              total_min=Math.floor(total_min/60);
+              if (total_min<1) total_min=1;
+              if (total_min>60) total_min=60;
+              detailedData[i]=tmpTab;
+              data[i]=total_min;
+            }
+          });
+          makeChart(data,detailedData);
+      	}
+      }
+      else {
+        makeChart([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],null);
+      }
     },
     error: function(){
 
@@ -321,19 +408,21 @@ function fetchSmsContact(){
     url: "fetch/retrieveSmsContact.php",
     dataType: "html",   //expect html to be returned
     success: function(result){
-      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+      if (result!=undefined){
+        jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
 
-    	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
-      	jq_obj = eval (jq_json_obj);
+      	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+        	jq_obj = eval (jq_json_obj);
 
-      	//Convert back to an array
-      	jq_array = [];
-      	for(elem in jq_obj){
-          jq_array.push(jq_obj[elem]);
+        	//Convert back to an array
+        	jq_array = [];
+        	for(elem in jq_obj){
+            jq_array.push(jq_obj[elem]);
+        	}
+       		addContactToSmsContainer(jq_array);
+          document.getElementsByClassName('active')[0].click();
       	}
-     		addContactToSmsContainer(jq_array);
-        document.getElementsByClassName('active')[0].click();
-    	}
+      }
     }
   });
 }

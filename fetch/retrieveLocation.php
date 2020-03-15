@@ -9,9 +9,14 @@ if (!isset($_SESSION['loggedin'])) {
 include '../DatabaseConfig.php' ;
 $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 
+// If there is an error with the connection, stop the script and display the error.
+ if ( mysqli_connect_errno() ) {
+   http_response_code(500);
+ }
+ 
 $key=$_SESSION['key'];
 $d1=$_GET['date']-3600000;
-$d2=$d1+82800000;
+$d2=$d1+86400000;
 $d1= date('Y-m-d H:i:s', $d1/1000);
 $d2= date('Y-m-d H:i:s', $d2/1000);
 
@@ -40,7 +45,7 @@ if ($stmt = $con->prepare('select date,lat,lon from location where idUser=? AND 
     $latAbove=$lat+0.00015;
     $lonBelow=$lon-0.00015;
     $lonAbove=$lon+0.00015;
-    
+
     $date= date('H:i', strtotime($date));
     $firstElem=array($date,$lat,$lon);
     array_push($tmp,$firstElem);
@@ -49,7 +54,7 @@ if ($stmt = $con->prepare('select date,lat,lon from location where idUser=? AND 
       $date= date('H:i', strtotime($date));
       array_push($data,array($date,$lat,$lon));
   	}
-
+    $o=0;
     foreach ($data as $elem) {
 
       $d=$elem[0];
@@ -75,54 +80,15 @@ if ($stmt = $con->prepare('select date,lat,lon from location where idUser=? AND 
           array_push($tmp2,array(array($tmp[0][1],$tmp[0][2]),"At ".$tmp[0][0]));
         }
         $tmp=[array($d,$la,$lo)];
-        /*
-        $result=[];
-        $firstTime="";
-        $previousTime="";
-        foreach ($tmp as $value) {
 
-          if ( ! isset($value[0])) $time = null;
-          else $time=$value[0];
-
-          if ($firstTime=="") $firstTime=$time;
-
-          if ($tmpId-$value["id"]!=1 && $tmpId!=-10){
-            if ($previousTime!=""){
-              array_push($result,"From ".$time." to ".$firstTime);
-              $firstTime="";
-              $previousTime="";
-            }
-            else {
-              echo "z ";
-              array_push($result,"At ".$firstTime);
-              $firstTime="";
-            }
-          }
-          else {
-            echo "e ";
-            $previousTime=$time;
-          }
-
-          $tmpId=$value["id"];
-        }
-        if ($tmp==null){
-          echo "r ";
-          array_push($result,"At ".$d);
-        }
-        if ($result==null){
-          if ($previousTime!="" && $previousTime!=$firstTime){
-            echo "t ";
-            array_push($result,"From ".$time." to ".$firstTime);
-          }
-          else {
-            echo "y ";
-            array_push($result,"At ".$firstTime);
-          }
-        }
-        array_push($res,array(array($tmpLat,$tmpLon),$result));
-        $tmp=[];
-        */
       }
+    }
+
+    if (sizeof($tmp)>1){
+      array_push($tmp2,array(array($tmp[0][1],$tmp[0][2]),"From ".$tmp[0][0]." to ".$tmp[sizeof($tmp)-1][0]));
+    }
+    else {
+      array_push($tmp2,array(array($tmp[0][1],$tmp[0][2]),"At ".$tmp[0][0]));
     }
 
     $res=[];
@@ -154,7 +120,7 @@ if ($stmt = $con->prepare('select date,lat,lon from location where idUser=? AND 
   	echo json_encode($res);
   }
   else {
-    http_response_code(404);
+    http_response_code(204);
   }
 }
 else {

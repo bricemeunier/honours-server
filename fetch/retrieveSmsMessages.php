@@ -9,11 +9,18 @@ if (!isset($_SESSION['loggedin'])) {
 
 include '../DatabaseConfig.php' ;
 
+$con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
+
+// If there is an error with the connection, stop the script and display the error.
+ if ( mysqli_connect_errno() ) {
+   http_response_code(500);
+ }
+
 $key=$_SESSION['key'];
 $address=$_GET['address'];
 $address=str_replace(' ', '', $address);
 $address="%".$address;
-$con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
+
 
 if ($stmt = $con->prepare('select action,message,date from sms where idUser=? AND address like ? order by date desc')){
   // Bind parameters to avoid sql injection

@@ -47,6 +47,7 @@ h5 {
 body {
 	width:65%;
 	margin: auto;
+  height: 100vh;
 }
 
 nav {
@@ -60,7 +61,7 @@ nav {
 @media screen and (max-width: 992px) {
   body {
     width:100%;
-    min-height:100vh;
+    height:100vh;
   }
 
   .b-r{
@@ -80,7 +81,7 @@ nav {
 }
 
 .b-r{
-  height: 75vh;
+  height:100%;
   overflow: hidden;
 }
 
@@ -114,13 +115,19 @@ nav {
   box-sizing: border-box;
 }
 
+#profile-page {
+  height:100%;
+  background-color: #f3f4f7;
+}
+
 html {
 	font-family: 'PT Sans', Georgia, serif;
 }
 
 #discussion {
 	max-width: 600px;
-	margin: 2% 5% auto;
+  height:100%;
+	padding: 2% 5% 2%;
 	display: flex;
 	flex-flow: column wrap;
 }
@@ -134,12 +141,12 @@ html {
 
 #discussion > .bubble.sender {
 	align-self: flex-start;
-	background-color: #26A69A;
-	color: #fff;
+	background-color: #dbd8d8;
 }
 #discussion > .bubble.recipient {
 	align-self: flex-end;
-	background-color: #c8c2c2;
+	background-color: #3274d6;
+	color: #fff;
 }
 
 #discussion > .bubble.sender.first { border-bottom-left-radius: 0.1em; }
@@ -161,12 +168,19 @@ html {
 	background-color:#d7d2d2;
 }
 
+.collection .collection-item.active {
+  background-color: #3274d6;
+}
+
+.collection {
+  margin:0px 0px 0px 0px;
+}
+
 #choosenDate {
   width: auto;
 }
 
 #mapid {
-  height:60vh;
   width: 100%;
 }
 
@@ -175,10 +189,31 @@ html {
 }
 
 form {
-  width:fit-content;
+  width:max-content;
   margin: 1% 0% 1% 10%;
 }
 
 .datepicker-date-display {
   background-color: #3274d6;
+}
+
+#monitoredContent {
+  width:100%;
+}
+
+#monitoredContent > div {
+  height:100%;
+}
+
+.container-fluid {
+  height: 100%;
+}
+
+.row {
+  height: 100%;
+  margin-bottom:0px;
+}
+
+#numberList {
+  height:100%;
 }

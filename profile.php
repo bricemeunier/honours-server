@@ -35,21 +35,21 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
 		<link href="style/style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-		<nav>
-			<div class="nav-wrapper">
-				<a href="home.php" class="brand-logo">Monitoring Dashboard</a>
-				<a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-				<ul id="nav-mobile" class="right hide-on-med-and-down">
-					<li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
-					<li><a href="logout.php">Logout</a></li>
-				</ul>
-			</div>
-		</nav>
-		<ul class="sidenav" id="mobile-demo">
-			<li><a href="#"><?php echo $_SESSION['name']; ?></a></li>
-			<li><a href="logout.php">Logout</a></li>
-		</ul>
-		<div class="content">
+		<div id="profile-page">
+			<nav>
+				<div class="nav-wrapper">
+					<a href="home.php" class="brand-logo">Monitoring Dashboard</a>
+					<a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+					<ul id="nav-mobile" class="right hide-on-med-and-down">
+						<li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
+						<li><a href="logout.php">Logout</a></li>
+					</ul>
+				</div>
+			</nav>
+			<ul class="sidenav" id="mobile-demo">
+				<li><a href="#"><?php echo $_SESSION['name']; ?></a></li>
+				<li><a href="logout.php">Logout</a></li>
+			</ul>
 			<div>
 				<h5>Account details</h5>
 				<br>
