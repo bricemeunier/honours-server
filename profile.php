@@ -33,6 +33,7 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 		<link href="style/style.css" rel="stylesheet" type="text/css">
+		<link rel="shortcut icon" href="img/fav.png">
 	</head>
 	<body>
 		<div id="profile-page">
