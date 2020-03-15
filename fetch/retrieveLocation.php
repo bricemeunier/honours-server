@@ -15,7 +15,7 @@ $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
  }
  
 $key=$_SESSION['key'];
-$d1=$_GET['date']-3600000;
+$d1=$_GET['date'];
 $d2=$d1+86400000;
 $d1= date('Y-m-d H:i:s', $d1/1000);
 $d2= date('Y-m-d H:i:s', $d2/1000);
