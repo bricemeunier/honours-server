@@ -6,17 +6,9 @@ include '../DatabaseConfig.php' ;
  $key = $_POST['key'];
  $address = $_POST['address'];
  $message = $_POST['message'];
- $date = $_POST['date']; 
- $Sql_Query = "insert into sms (idUser,date,address,message) values ('$key','$date','$address','$message')";
+ $date = $_POST['date'];
+ $action = $_POST['action'];
+ $Sql_Query = "insert into sms (idUser,date,action,address,message) values ('$key','$date','$action','$address','$message')";
 
- if(mysqli_query($con,$Sql_Query)){
-
- echo 'Data Submit Successfully';
-
- }
- else{
-
- echo 'Try Again';
-
-}
+ mysqli_query($con,$Sql_Query);
 ?>
