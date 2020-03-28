@@ -127,6 +127,10 @@ $(document).ready(function() {
   //sms page loading on click
   $("#smsButton").on('click',function() {
 
+    //empty the actual div to avoid display issues
+    $("#numberList").empty();
+    //$("#discussion").empty();
+
     //empty the two other divs
     $("#mapid").empty();
     if(window.myChart != undefined) {
@@ -511,8 +515,6 @@ function addMessageToHTML(data){
 
   }
   $('.tooltipped').tooltip();
-  var msg = $(".b-r")[1];
-  msg.scrollTop = msg.scrollHeight;
 }
 
 // Manage the nav bar containing the monitored information
@@ -526,4 +528,3 @@ function openTabs(e,div) {
 
 </script>
 </html>
-

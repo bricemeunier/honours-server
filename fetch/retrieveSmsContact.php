@@ -19,7 +19,7 @@ if (!isset($_SESSION['loggedin'])) {
 
  $key=$_SESSION['key'];
 
- $sql = "select distinct address from sms where idUser='$key' order by date desc";
+ $sql = "select address from (select address,max(date) as d from sms where idUser='$key' group by address ORDER BY d DESC) as base";
  $result = mysqli_query($con,$sql);
  $data=[];
  if (mysqli_num_rows($result)<1){

@@ -82,7 +82,7 @@ nav {
 
 .b-r{
   height:100%;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .col-xs-3 {
@@ -108,9 +108,7 @@ nav {
 }
 .scrll_hide {
   float: right;
-  height: 100%;
   width: calc(100% + 48px);
-  overflow-y: scroll;
   margin: 0 -32px 0 0 !important;
   box-sizing: border-box;
 }
@@ -125,6 +123,7 @@ html {
 }
 
 #discussion {
+  margin:auto;
 	max-width: 600px;
   height:100%;
 	padding: 2% 5% 2%;
@@ -137,7 +136,7 @@ html {
 	padding: 0.25em 0.75em;
 	margin: 0.0625em;
 	max-width: 50%;
-	word-wrap: break-word;
+  word-wrap: break-word;
 }
 
 #discussion > .bubble.sender {
@@ -218,3 +217,10 @@ form {
 #numberList {
   height:100%;
 }
+
+
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
