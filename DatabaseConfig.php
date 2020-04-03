@@ -7,7 +7,7 @@ $HostName = "localhost";
 $HostUser = "root";
 
 //Define your database password here.
-$HostPass = "jE9!7aGUio0;";
+$HostPass = "";//jE9!7aGUio0;";
 
 //Define your database name here.
 $DatabaseName = "honours";

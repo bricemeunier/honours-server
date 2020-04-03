@@ -29,6 +29,8 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
 <html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 		<title>Profile Page</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -48,27 +50,39 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
 				</div>
 			</nav>
 			<ul class="sidenav" id="mobile-demo">
-				<li><a href="#"><?php echo $_SESSION['name']; ?></a></li>
+				<li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
 				<li><a href="logout.php">Logout</a></li>
 			</ul>
-			<div>
+			<div id="showInfo">
 				<h5>Account details</h5>
 				<br>
 				<table id="accountDetails">
 					<tr>
 						<td>Username</td>
-						<td><?=$_SESSION['name']?></td>
+						<td id="longString"><?=$_SESSION['name']?></td>
 					</tr>
 					<tr>
 						<td>Private key</td>
-						<td><?=$_SESSION['key']?></td>
+						<td id="longString"><?=$_SESSION['key']?></td>
 					</tr>
 					<tr>
 						<td>Email</td>
-						<td><?=$email?></td>
+						<td id="longString"><?=$email?></td>
 					</tr>
 				</table>
 			</div>
 		</div>
 	</body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<script type="text/javascript">
+
+	// jquery loading when page starts
+	$(document).ready(function() {
+
+	  //responsive navbar
+	  $('.sidenav').sidenav();
+	});
+	</script>
 </html>

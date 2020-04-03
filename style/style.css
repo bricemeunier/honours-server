@@ -58,34 +58,12 @@ nav {
     background-color: #f3f4f7;
 }
 
-@media screen and (max-width: 992px) {
-  body {
-    width:100%;
-    height:100vh;
-  }
-
-  .b-r{
-    height: 95vh;
-  }
-
-  #accountDetails {
-    width:80%;
-    margin:auto;
-  }
-
-  nav .brand-logo {
-    left:15%;
-    transform: none;
-    -webkit-transform:none;
-  }
-}
-
 .b-r{
   height:100%;
   overflow-x: hidden;
 }
 
-.col-xs-3 {
+.num {
   position: relative;
   min-height: 1px;
   padding-right: 15px;
@@ -94,7 +72,7 @@ nav {
   width:25%;
 }
 
-.col-xs-9{
+.text {
   position: relative;
   min-height: 1px;
   padding-right: 15px;
@@ -224,3 +202,36 @@ form {
     background: transparent;  /* Optional: just make scrollbar invisible */
 }
 
+
+@media screen and (max-width: 992px) {
+  body {
+    width:100%;
+    height:100vh;
+  }
+
+  #accountDetails {
+    width:85%;
+  }
+
+  #longString {
+    word-break: break-all;
+  }
+
+  nav .brand-logo {
+    left:15%;
+    transform: none;
+    -webkit-transform:none;
+  }
+
+  #discussion {
+    padding: 2% 10% 2% 4%;
+  }
+
+  .num {
+    width: 33%;
+  }
+
+  .text {
+    width: 67%;
+  }
+}

@@ -11,6 +11,7 @@ if (!isset($_SESSION['loggedin'])) {
 <html>
   <head>
 		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Home Page</title>
     <!-- materialize -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -56,12 +57,12 @@ if (!isset($_SESSION['loggedin'])) {
         <div id="smsContainer">
     		    <div class="container-fluid">
         			<div class="row">
-                <div class="col-xs-3 b-r" >
+                <div class="num b-r" >
                   <div class="scrll_hide">
                     <div class="collection" id="numberList"></div>
                   </div>
                 </div>
-                <div class="col-xs-9 b-r" >
+                <div class="text b-r" >
                   <div class="scrll_hide">
                     <div id="discussion"></div>
                   </div>
@@ -99,7 +100,7 @@ $(document).ready(function() {
   $("#main").height(body-nav-(body*0.01));
   var main=$("#main").height();
   var tab=$(".tab").height();
-  $("#monitoredContent").height(main-tab-(main*0.01)-1);
+  $("#monitoredContent").height(main-tab-(main*0.01));
   var moni=$("#monitoredContent").height();
   var datePicker=null;
 
@@ -526,4 +527,3 @@ function openTabs(e,div) {
 
 </script>
 </html>
-
