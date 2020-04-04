@@ -75,6 +75,7 @@ if (!isset($_SESSION['loggedin'])) {
     			<form id="pickDate" method="get">
             <input type="text" class="appUsageDatepicker"/>
           </form>
+          <div id="chartContainer"></div>
         </div>
       </div>
     </div>
@@ -227,6 +228,7 @@ function makeMap(data){
     mymap.fitBounds(bounds,{maxZoom:13});
   }
 }
+
 //fetch locations from a given day
 function getLocationFromDate(d){
 
@@ -334,7 +336,7 @@ function makeChart(data, detailedData){
   else {
     var canvas = document.createElement('canvas');
     canvas.id = "myChart";
-    var parent=document.getElementById("appUsageContainer");
+    var parent=document.getElementById("chartContainer");
     parent.appendChild(canvas);
   }
 
@@ -353,6 +355,7 @@ function makeChart(data, detailedData){
           }]
       },
       options: {
+        maintainAspectRatio: false,
         legend: {
           display: false
         },
