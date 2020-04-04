@@ -31,7 +31,7 @@ if ($stmt = $con->prepare('select action,message,date from sms where idUser=? AN
 	$data=[];
 	$stmt->bind_result($action,$message,$date);
 	while ($temp = $stmt->fetch()){
-    $date=date("d/m/Y H:i:s",$date/1000);
+    $date=date("d/m/Y H:i:s",($date+7200000)/1000);
     array_push($data,array($action,$message,$date));
 	}
 	echo json_encode($data);

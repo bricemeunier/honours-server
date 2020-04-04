@@ -13,9 +13,9 @@ $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
  if ( mysqli_connect_errno() ) {
    http_response_code(500);
  }
- 
+
 $key=$_SESSION['key'];
-$d1=$_GET['date'];
+$d1=$_GET['date']+7200000;
 $d2=$d1+86400000;
 $d1= date('Y-m-d H:i:s', $d1/1000);
 $d2= date('Y-m-d H:i:s', $d2/1000);
