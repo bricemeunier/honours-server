@@ -83,6 +83,7 @@ if (!isset($_SESSION['loggedin'])) {
               <input type="text" class="appUsageDatepicker"/>
             </form>
             <div id="chartContainer"></div>
+            <div id="appUsageDetails"></div>
           </div>
 
           <div id="contactContainer"></div>
@@ -226,7 +227,7 @@ $(document).ready(function() {
     $("#mapid").empty();
     $("#numberList").empty();
     $("#discussion").empty();
-
+    $("#appUsageDetails").empty();
     if (datePicker!=null){
       datePicker=null;
     }
@@ -456,15 +457,18 @@ function getAppUsageFromDate(d){
             }
           });
           makeChart(data,detailedData);
+          addAppUsageDetailsToHTML(data, detailedData);
       	}
       }
       else {
         makeChart([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],null);
+        addAppUsageDetailsToHTML(null,null);
       }
     },
     error: function(){
 
       makeChart([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],null);
+      addAppUsageDetailsToHTML(null,null);
     }
   });
 
@@ -546,6 +550,213 @@ function makeChart(data, detailedData){
         }
       }
   });
+}
+
+
+function addAppUsageDetailsToHTML(data,detailedData) {
+
+  var total_time_in_apps=0;
+  var average_time_used_by_hour=0;
+  var counting_active_hour=0;
+
+  if (data!=null) {
+    for (var i=0;i<data.length;i++){
+      if (data[i]>0){
+          counting_active_hour++;
+          total_time_in_apps+=parseInt(data[i]);
+      }
+    }
+    average_time_used_by_hour=total_time_in_apps;
+    //calcul to determine how many hours a day has been spent on the phone
+    if (total_time_in_apps>59){
+      var m=total_time_in_apps-Math.floor(total_time_in_apps/60)*60;
+      if (m<10) {
+        total_time_in_apps=Math.floor(total_time_in_apps/60)+" h 0"+m+" min";
+      }
+      else {
+        total_time_in_apps=Math.floor(total_time_in_apps/60)+" h "+m+" min";
+      }
+    }
+    else {
+      total_time_in_apps=total_time_in_apps+" min";
+    }
+  }
+  else total_time_in_apps="0 min"
+
+
+  $("#appUsageDetails").empty();
+  var div=document.getElementById("appUsageDetails");
+
+
+  //create table for total time using Phone
+  var table_total_time=document.createElement("table");
+  table_total_time.setAttribute("class","highlight");
+  var thead_total=document.createElement("thead");
+  var trhead_total=document.createElement("tr");
+  var thStat=document.createElement("th");
+  var thTime_total=document.createElement("th");
+  thStat.append("Stats");
+  thTime_total.append("Time");
+  trhead_total.appendChild(thStat);
+  trhead_total.appendChild(thTime_total);
+  thead_total.appendChild(trhead_total);
+  table_total_time.appendChild(thead_total);
+
+  var tbody_total=document.createElement("tbody");
+  var tr_total_time=document.createElement("tr");
+  var td_total_time_span=document.createElement("td");
+  var td_total_time=document.createElement("td");
+  td_total_time_span.append("Total time used this day");
+  td_total_time.append(total_time_in_apps);
+  tr_total_time.appendChild(td_total_time_span);
+  tr_total_time.appendChild(td_total_time);
+  tbody_total.appendChild(tr_total_time);
+
+  //adding average time used by hour
+  min=Math.floor(Math.floor(average_time_used_by_hour*60/24)/60);
+  sec=Math.floor(average_time_used_by_hour*60/24)-min*60;
+  res="";
+  if (min>0) {
+    res=min+" min ";
+  }
+  if (sec<10 && sec!=0) {
+    res+="0"+sec+" s";
+  }
+  else if (sec!=0) {
+    res+=sec+" s";
+  }
+  else if (min>0){
+    res+=sec+" s";
+  }
+
+  if (res=="") {
+    res+="N/A";
+  }
+
+  var tr_average_time=document.createElement("tr");
+  var td_average_time_span=document.createElement("td");
+  var td_average_time=document.createElement("td");
+  td_average_time_span.append("Average Time spent per hour");
+  td_average_time.append(res);
+  tr_average_time.appendChild(td_average_time_span);
+  tr_average_time.appendChild(td_average_time);
+  tbody_total.appendChild(tr_average_time);
+
+
+  //adding average time used by active hour
+  min=Math.floor(Math.floor(average_time_used_by_hour*60/counting_active_hour)/60);
+  sec=Math.floor(average_time_used_by_hour*60/counting_active_hour)-min*60;
+  res="";
+  if (counting_active_hour!=0){
+    if (min>0) {
+      res=min+" min ";
+    }
+
+    if (sec<10 && sec!=0) {
+      res+="0"+sec+" s";
+    }
+    else if (sec!=0) {
+      res+=sec+" s";
+    }
+    else if (min>0){
+      res+=sec+" s";
+    }
+
+    if (res=="") {
+      res+="N/A";
+    }
+  }
+  else res="N/A";
+
+  var tr_active_time=document.createElement("tr");
+  var td_active_time_span=document.createElement("td");
+  var td_active_time=document.createElement("td");
+  td_active_time_span.append("Average Time spent per active hour");
+  td_active_time.append(res);
+  tr_active_time.appendChild(td_active_time_span);
+  tr_active_time.appendChild(td_active_time);
+  tbody_total.appendChild(tr_active_time);
+
+
+  //adding the table with 3 lines to the div
+  table_total_time.appendChild(tbody_total);
+  div.appendChild(table_total_time);
+
+
+
+  //calcul to determine how long each app have been used on the selected day
+  if (detailedData!=null) {
+    var result = new Map();
+    details=[];
+
+    for (var i=0;i<detailedData.length;i++) {
+      if (detailedData[i]!=0) details=details.concat(detailedData[i]);
+    }
+
+    for (var i=0;i<details.length;i++) {
+      if (!(result.has(details[i][0]))){
+        app_name=details[i][0];
+        time_app=parseInt(details[i][1]);
+
+        for (var j=i+1;j<details.length;j++){
+          if (app_name==details[j][0]) {
+            time_app+=parseInt(details[j][1]);
+          }
+        }
+        result.set(app_name,time_app);
+      }
+    }
+    result = new Map([...result.entries()].sort((a, b) => b[1] - a[1]));
+
+
+    //create table for total time using every app
+    var table=document.createElement("table");
+    table.setAttribute("class","highlight centered");
+    var thead=document.createElement("thead");
+    var trhead=document.createElement("tr");
+    var thApp=document.createElement("th");
+    var thTime=document.createElement("th");
+    thApp.append("App");
+    thTime.append("Total time this day");
+    trhead.appendChild(thApp);
+    trhead.appendChild(thTime);
+    thead.appendChild(trhead);
+    table.appendChild(thead);
+    var tbody=document.createElement("tbody");
+
+    for (var [a,t] of result) {
+
+      s=t-Math.floor(t/60)*60;
+      if (s>9) s=s+" s";
+      else if (s!=0) s="0"+s+" s";
+      else s="";
+
+      t=Math.floor(t/60);
+      if (t>59){
+        var m=t-Math.floor(t/60)*60;
+        if (m<10) {
+          t=Math.floor(t/60)+" h 0"+m+" min "+s;
+        }
+        else {
+          t=Math.floor(t/60)+" h "+m+" min "+s;
+        }
+      }
+      else if (t!=0) t=t+" min "+s;
+      else t=s;
+
+      var tr=document.createElement("tr");
+      var tdA=document.createElement("td");
+      var tdT=document.createElement("td");
+      tdA.append(a);
+      tdT.append(t);
+      tr.appendChild(tdA);
+      tr.appendChild(tdT);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    div.appendChild(table);
+
+  }
 }
 
 //for sms, fetch all the contact numbers

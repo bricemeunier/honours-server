@@ -215,6 +215,21 @@ form {
   height:80%;
 }
 
+#appUsageContainer {
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+#appUsageDetails {
+  width:50%;
+  margin:auto;
+}
+
+#appUsageDetails table {
+  margin-top:10%;
+}
+
+
 @media screen and (max-width: 992px) {
   body {
     width:100%;
@@ -245,5 +260,9 @@ form {
 
   .text {
     width: 67%;
+  }
+
+  #appUsageDetails {
+    width:70%;
   }
 }
