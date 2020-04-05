@@ -44,14 +44,15 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
 					<a href="home.php" class="brand-logo">Monitoring Dashboard</a>
 					<a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
 					<ul id="nav-mobile" class="right hide-on-med-and-down">
-						<li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
-						<li><a href="logout.php">Logout</a></li>
+						<li><a href="#"><b><?php echo $_SESSION['name']; ?></b></a></li>
+						<li><a href="logout.php"><b>Logout</b></a></li>
 					</ul>
 				</div>
 			</nav>
 			<ul class="sidenav" id="mobile-demo">
-				<li><a href="profile.php"><?php echo $_SESSION['name']; ?></a></li>
-				<li><a href="logout.php">Logout</a></li>
+				<li><a href="home.php" class="brand-logo">Monitoring Dashboard</a></li>
+				<li><a href="#"><b><?php echo $_SESSION['name']; ?></b></a></li>
+				<li><a href="logout.php"><b>Logout</b></a></li>
 			</ul>
 			<div id="showInfo">
 				<h5>Account details</h5>
@@ -82,7 +83,11 @@ if ($stmt = $con->prepare('SELECT email FROM accounts WHERE id = ?')){
 	$(document).ready(function() {
 
 	  //responsive navbar
-	  $('.sidenav').sidenav();
+	  $('.sidenav')
+			.sidenav()
+			.on('click tap', 'li a', () => {
+	      $('.sidenav').sidenav('close')
+			})
 	});
 	</script>
 </html>

@@ -22,61 +22,72 @@ if (!isset($_SESSION['loggedin'])) {
   </head>
 
   <body>
-    <div id="naviguation">
-      <nav>
-        <div class="nav-wrapper">
-          <a href="#" class="brand-logo">Monitoring Dashboard</a>
-          <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-          <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
-            <li><a href="logout.php"><b>Logout</b></a></li>
-          </ul>
-        </div>
-      </nav>
-      <ul class="sidenav" id="mobile-demo">
-        <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
-        <li><a href="logout.php"><b>Logout</b></a></li>
-      </ul>
-    </div>
+    <div id="pageContainer">
+      <div id="naviguation">
+        <nav>
+          <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Monitoring Dashboard</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+              <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
+              <li><a href="logout.php"><b>Logout</b></a></li>
+            </ul>
+          </div>
+        </nav>
+        <ul class="sidenav" id="mobile-demo">
+          <li><a href="#" class="brand-logo">Monitoring Dashboard</a></li>
+          <li id="locationButton-mobile"><a href="javascript:openTabs(event,'#locationContainer',true);"><b>Location</b></a></li>
+          <li id="smsButton-mobile"><a href="javascript:openTabs(event,'#smsContainer',true);"><b>SMS</b></a></li>
+          <li id="appButton-mobile"><a href="javascript:openTabs(event,'#appUsageContainer',true);"><b>App Usage</b></a></li>
+          <li id="contactButton-mobile"><a href="javascript:openTabs(event,'#contactContainer',true);"><b>Contact List</b></a></li>
+          <li><a href="profile.php"><b>Profile</b></a></li>
+          <li><a href="logout.php"><b>Logout</b></a></li>
+        </ul>
+      </div>
 
-    <div id="main">
+      <div id="main">
 
-  		<div class="tab">
-        <button id="locationButton" onclick="openTabs(event,'#locationContainer')">Location</button>
-        <button id="smsButton" onclick="openTabs(event,'#smsContainer')">SMS</button>
-        <button id="appButton" onclick="openTabs(event,'#appUsageContainer')">App Usage</button>
-  		</div>
-      <div id="monitoredContent">
-        <div id="locationContainer">
-          <form id="selectDate" method="get">
-            <input type="text" class="locationDatepicker"/>
-          </form>
-          <div id="mapid"></div>
-        </div>
+    		<div class="tab">
+          <button id="locationButton" onclick="openTabs(event,'#locationContainer')">Location</button>
+          <button id="smsButton" onclick="openTabs(event,'#smsContainer')">SMS</button>
+          <button id="appButton" onclick="openTabs(event,'#appUsageContainer')">App Usage</button>
+          <button id="contactButton" onclick="openTabs(event,'#contactContainer')">Contact List</button>
+    		</div>
+        <div id="monitoredContent">
+          <div id="locationContainer">
+            <form id="selectDate" method="get">
+              <input type="text" class="locationDatepicker"/>
+            </form>
+            <div id="mapid"></div>
+          </div>
 
-        <div id="smsContainer">
-    		    <div class="container-fluid">
-        			<div class="row">
-                <div class="num b-r" >
-                  <div class="scrll_hide">
-                    <div class="collection" id="numberList"></div>
+          <div id="smsContainer">
+      		    <div class="container-fluid">
+          			<div class="row">
+                  <div class="num b-r" >
+                    <div class="scrll_hide">
+                      <div class="collection" id="numberList"></div>
+                    </div>
                   </div>
-                </div>
-                <div class="text b-r" >
-                  <div class="scrll_hide">
-                    <div id="discussion"></div>
+                  <div class="text b-r" >
+                    <div class="scrll_hide">
+                      <div id="discussion"></div>
+                    </div>
                   </div>
-                </div>
-    			    </div>
-    		    </div>
+      			    </div>
+      		    </div>
+          </div>
+
+      		<div id="appUsageContainer">
+      			<form id="pickDate" method="get">
+              <input type="text" class="appUsageDatepicker"/>
+            </form>
+            <div id="chartContainer"></div>
+          </div>
+
+          <div id="contactContainer"></div>
         </div>
 
-    		<div id="appUsageContainer">
-    			<form id="pickDate" method="get">
-            <input type="text" class="appUsageDatepicker"/>
-          </form>
-          <div id="chartContainer"></div>
-        </div>
       </div>
     </div>
   </body>
@@ -91,7 +102,15 @@ if (!isset($_SESSION['loggedin'])) {
 $(document).ready(function() {
 
   //responsive navbar
-  $('.sidenav').sidenav();
+  $('.sidenav')
+    .sidenav()
+    .on('click tap', 'li a', () => {
+      $('.sidenav').sidenav('close');
+    });
+
+  if (!$('.hide-on-med-and-down').is(':visible')) {
+    $('.tab').hide();
+  }
 
   //div fit window on load
   //should be set with resize as $(window).on('load resize',...)
@@ -100,18 +119,35 @@ $(document).ready(function() {
   var nav=$("#naviguation").height();
   $("#main").height(body-nav-(body*0.01));
   var main=$("#main").height();
-  var tab=$(".tab").height();
+  if (!$('.tab').is(':visible')) {
+    var tab=0;
+  }
+  else {
+    var tab=$(".tab").height();
+  }
   $("#monitoredContent").height(main-tab-(main*0.01));
   var moni=$("#monitoredContent").height();
   var datePicker=null;
 
   //fit window on resize
   $(window).on('resize',function () {
+    if (!$('.hide-on-med-and-down').is(':visible')) {
+      $('.tab').hide();
+    }
+    else {
+      $('.tab').show();
+    }
+
     body=$("body").height();
     nav=$("#naviguation").height();
     $("#main").height(body-nav-(body*0.01));
     main=$("#main").height();
-    tab=$(".tab").height();
+    if (!$('.tab').is(':visible')) {
+      tab=0;
+    }
+    else {
+      tab=$(".tab").height();
+    }
     $("#monitoredContent").height(main-tab-(main*0.01)-1);
     moni=$("#monitoredContent").height();
     if (datePicker!=null){
@@ -126,6 +162,11 @@ $(document).ready(function() {
   var mm = today.getMonth()+1;
   var yyyy = today.getFullYear();
 
+  //redirect on click on mobile view
+  $("#smsButton-mobile").on('click',function() {
+    document.getElementById('smsButton').click();
+  });
+
   //sms page loading on click
   $("#smsButton").on('click',function() {
 
@@ -139,6 +180,11 @@ $(document).ready(function() {
       datePicker=null;
     }
   	fetchSmsContact();
+  });
+
+  //redirect on click on mobile view
+  $("#locationButton-mobile").on('click',function() {
+    document.getElementById('locationButton').click();
   });
 
   //location page on click
@@ -168,7 +214,12 @@ $(document).ready(function() {
     });
   });
 
-  //app usage page on onclick
+  //redirect on click on mobile view
+  $("#appButton-mobile").on('click',function() {
+    document.getElementById('appButton').click();
+  });
+
+  //app usage page on click
   $("#appButton").on('click',function() {
 
     //empty the two other divs
@@ -196,10 +247,101 @@ $(document).ready(function() {
 
   });
 
+  //redirect on click on mobile view
+  $("#contactButton-mobile").on('click',function() {
+    document.getElementById('contactButton').click();
+  });
+
+  //contact list page on click
+  $("#contactButton").on('click', function() {
+
+    //empty other tabs
+    $("#mapid").empty();
+    $("#numberList").empty();
+    $("#discussion").empty();
+    if(window.myChart != undefined) {
+      window.myChart.destroy();
+    }
+
+    addContactListToContactContainer();
+  });
+
 	document.getElementById('locationButton').click();
 
 });
 
+//for contact list, fetch every contact
+function fetchContactList(){
+
+  return $.ajax({    //create an ajax request to display.php
+    type: "GET",
+    url: "fetch/retrieveContactList.php",
+    dataType: "html",   //expect html to be returned
+    success: function(result){
+      return result;
+    },
+    error: function(){
+      return null;
+    }
+  });
+}
+
+//for contact list, add contact list to contactContainer
+function addContactListToContactContainer(){
+  $.when(fetchContactList()).done(function(result){
+    if (result!=undefined){
+      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+      if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+        jq_obj = eval (jq_json_obj);
+
+        //Convert back to an array
+        jq_array = [];
+        for(elem in jq_obj){
+          jq_array.push(jq_obj[elem]);
+        }
+        list=jq_array;
+      }
+    }
+
+    if (list==null){
+      $('#contactContainer').html("Error while fetching contact list, please try again");
+    }
+    else {
+      var div=document.getElementById("contactContainer");
+      var t=document.createElement("table");
+      t.setAttribute("class","highlight");
+      var thead=document.createElement("thead");
+      var trhead=document.createElement("tr");
+      var thName=document.createElement("th");
+      var thPhone=document.createElement("th");
+      thName.append("Name");
+      thPhone.append("Phone");
+      trhead.appendChild(thName);
+      trhead.appendChild(thPhone);
+      thead.appendChild(trhead);
+      t.appendChild(thead);
+      var tbody=document.createElement("tbody");
+
+      for (var i=0;i<list.length;i++) {
+        var row=list[i];
+        var tr=document.createElement("tr");
+        var tdName=document.createElement("td");
+        var tdPhone=document.createElement("td");
+        tdName.append(row[0]);
+        tdPhone.append(row[1]);
+        tr.appendChild(tdName);
+        tr.appendChild(tdPhone);
+        tbody.appendChild(tr);
+      }
+      t.appendChild(tbody);
+      div.appendChild(t);
+    }
+  });
+
+}
+
+//for location, create the open street map
 function makeMap(data){
 
   //create a new map each time
@@ -227,9 +369,10 @@ function makeMap(data){
     var bounds = new L.LatLngBounds(arrayOfLatLngs);
     mymap.fitBounds(bounds,{maxZoom:13});
   }
+  mymap.zoomControl.setPosition('topright');
 }
 
-//fetch locations from a given day
+//for location, fetch locations from a given day
 function getLocationFromDate(d){
 
   $.ajax({    //create an ajax request to display.php
@@ -269,7 +412,7 @@ function getLocationFromDate(d){
 
 }
 
-//fetch application usage statistics from a given date
+//for app usage, fetch application usage statistics from a given date
 function getAppUsageFromDate(d){
 
   $.ajax({    //create an ajax request to display.php
@@ -327,7 +470,7 @@ function getAppUsageFromDate(d){
 
 }
 
-//create chart for appUsage page
+//for app usage, create chart for appUsage page
 function makeChart(data, detailedData){
 
   if(window.myChart != undefined) {
@@ -405,7 +548,7 @@ function makeChart(data, detailedData){
   });
 }
 
-// fetch all the contact numbers
+//for sms, fetch all the contact numbers
 function fetchSmsContact(){
 	$.ajax({    //create an ajax request to display.php
     type: "GET",
@@ -414,31 +557,59 @@ function fetchSmsContact(){
     success: function(result){
       if (result!=undefined){
         jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
-
       	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
         	jq_obj = eval (jq_json_obj);
 
         	//Convert back to an array
         	jq_array = [];
-        	for(elem in jq_obj){
-            jq_array.push(jq_obj[elem]);
-        	}
-       		addContactToSmsContainer(jq_array);
-          document.getElementsByClassName('active')[0].click();
+          listContact=[];
+          $.when(fetchContactList()).done(function(result){
+            if (result!=undefined){
+              jq_json_obj_1 = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+              if(typeof jq_json_obj_1 == 'object') { //Test if variable is a [JSON] object
+                jq_obj_1 = eval (jq_json_obj_1);
+
+                //Convert back to an array
+                jq_array_1 = [];
+                for(elem in jq_obj_1){
+                  jq_array_1.push(jq_obj_1[elem]);
+                }
+                listContact=jq_array_1;
+              }
+            }
+            if (listContact!=null){
+              for(elem in jq_obj){
+                for (var i=0;i<listContact.length;i++){
+                  if (jq_obj[elem][0]==listContact[i][1]) {
+                    jq_obj[elem][1]=listContact[i][0];
+                  }
+                }
+                jq_array.push(jq_obj[elem]);
+            	}
+           		addContactToSmsContainer(jq_array);
+              document.getElementsByClassName('active')[0].click();
+            }
+          });
       	}
       }
     }
   });
 }
 
-// Add contact numbers to HTML
-function addContactToSmsContainer(data,id){
+//for sms, Add contact numbers to HTML
+function addContactToSmsContainer(data){
 
   for (var i=0;i<data.length;i++){
 
     var row=data[i];
     var newP=document.createElement("p");
-    var text=document.createTextNode(row[0]);
+    if (row.length>1){
+      var text=document.createTextNode(row[1]);
+    }
+    else {
+      var text=document.createTextNode(row[0]);
+    }
     var div=document.getElementById("numberList");
     var newDiv=document.createElement("div");
 
@@ -459,7 +630,7 @@ function addContactToSmsContainer(data,id){
 
 }
 
-// fetch all messages from a contact number
+//for sms, fetch all messages from a contact number
 function getMessage(id){
 
   var previousId=document.getElementsByClassName('active')[0].id;
@@ -490,7 +661,7 @@ function getMessage(id){
   });
 }
 
-// add messages from a contact number to HTML
+//for sms, add messages from a contact number to HTML
 function addMessageToHTML(data){
 
   var sec=document.getElementById("discussion");
@@ -519,12 +690,17 @@ function addMessageToHTML(data){
   msg.scrollTop = msg.scrollHeight;
 }
 
-// Manage the nav bar containing the monitored information
-function openTabs(e,div) {
+//Manage the nav bar containing the monitored information
+function openTabs(e,div,bool) {
 	$("#monitoredContent").children().hide();
   $(div).show();
-  $(".tab button").css("background-color","initial");
-  e.currentTarget.style="background-color: #ccc;";
+  if (bool){
+    $("#mobile-demo button").css("background-color","initial");
+  }
+  else {
+    $(".tab button").css("background-color","initial");
+    e.currentTarget.style="background-color: #ccc;";
+  }
 }
 
 

@@ -32,9 +32,18 @@ h5 {
   text-align: center;
 }
 
-#accountDetails {
+#accountDetails, #contactContainer {
   width:55%;
   margin:auto;
+}
+
+#contactContainer {
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+table.highlight>tbody>tr:hover {
+    background-color: #ced1d4;      /* whatever color you want */
 }
 
 * {
@@ -54,8 +63,8 @@ nav {
   background-color: #3274d6;
 }
 
-#main {
-    background-color: #f3f4f7;
+#pageContainer {
+  background-color: #f3f4f7;
 }
 
 .b-r{
