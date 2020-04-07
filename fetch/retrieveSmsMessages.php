@@ -22,21 +22,21 @@ $address=str_replace(' ', '', $address);
 $address="%".$address;
 
 
-if ($stmt = $con->prepare('select action,message,date from sms where idUser=? AND address like ? order by date desc')){
+if ($stmt = $con->prepare('select action,message,date,warning from sms where idUser=? AND address like ? order by date desc')){
   // Bind parameters to avoid sql injection
   $stmt->bind_param('ss',$key,$address);
   $stmt->execute();
   // Store the result so we can check if the account exists in the database.
   $stmt->store_result();
 	$data=[];
-	$stmt->bind_result($action,$message,$date);
+	$stmt->bind_result($action,$message,$date,$warning);
 	while ($temp = $stmt->fetch()){
     $date=date("d/m/Y H:i:s",($date+7200000)/1000);
-    array_push($data,array($action,$message,$date));
+    array_push($data,array($action,$message,$date,$warning));
 	}
 	echo json_encode($data);
 }
 else {
-  echo "Nice try";
+  http_response_code(500);
 }
 ?>

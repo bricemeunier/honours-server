@@ -29,6 +29,10 @@ if (!isset($_SESSION['loggedin'])) {
             <a href="#" class="brand-logo">Monitoring Dashboard</a>
             <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
+              <li id="notif-dropdown"><a class="dropdown-trigger" href="#!" data-target="notification">
+                <i class="material-icons white-text notif">notifications</i>
+                <small class="notification-badge"></small>
+              </a></li>
               <li><a href="profile.php"><b><?php echo $_SESSION['name']; ?></b></a></li>
               <li><a href="logout.php"><b>Logout</b></a></li>
             </ul>
@@ -36,13 +40,20 @@ if (!isset($_SESSION['loggedin'])) {
         </nav>
         <ul class="sidenav" id="mobile-demo">
           <li><a href="#" class="brand-logo">Monitoring Dashboard</a></li>
-          <li id="locationButton-mobile"><a href="javascript:openTabs(event,'#locationContainer',true);"><b>Location</b></a></li>
-          <li id="smsButton-mobile"><a href="javascript:openTabs(event,'#smsContainer',true);"><b>SMS</b></a></li>
-          <li id="appButton-mobile"><a href="javascript:openTabs(event,'#appUsageContainer',true);"><b>App Usage</b></a></li>
-          <li id="contactButton-mobile"><a href="javascript:openTabs(event,'#contactContainer',true);"><b>Contact List</b></a></li>
+          <li><a id="linkNotification" href="#"><b id="countOfNotification">Notification</b></a></li>
+          <li id="locationButton-mobile"><a href="javascript:openTabs(null,'#locationButton');"><b>Location</b></a></li>
+          <li id="smsButton-mobile"><a href="javascript:openTabs(null,'#smsButton');"><b>SMS</b></a></li>
+          <li id="appButton-mobile"><a href="javascript:openTabs(null,'#appButton');"><b>App Usage</b></a></li>
+          <li id="contactButton-mobile"><a href="javascript:openTabs(null,'#contactButton');"><b>Contact List</b></a></li>
           <li><a href="profile.php"><b>Profile</b></a></li>
           <li><a href="logout.php"><b>Logout</b></a></li>
         </ul>
+
+
+        <!-- Dropdown Structure -->
+        <ul id='notification' class='dropdown-content'>
+        </ul>
+
       </div>
 
       <div id="main">
@@ -87,6 +98,7 @@ if (!isset($_SESSION['loggedin'])) {
           </div>
 
           <div id="contactContainer"></div>
+          <div id="notificationContainer"></div>
         </div>
 
       </div>
@@ -102,6 +114,8 @@ if (!isset($_SESSION['loggedin'])) {
 // jquery loading when page starts
 $(document).ready(function() {
 
+  checkForNotification();
+
   //responsive navbar
   $('.sidenav')
     .sidenav()
@@ -111,6 +125,13 @@ $(document).ready(function() {
 
   if (!$('.hide-on-med-and-down').is(':visible')) {
     $('.tab').hide();
+  }
+  else {
+    $('.dropdown-trigger')
+    .dropdown({
+      'coverTrigger':false,
+      'alignment':"right"
+    });
   }
 
   //div fit window on load
@@ -136,6 +157,11 @@ $(document).ready(function() {
       $('.tab').hide();
     }
     else {
+      $('.dropdown-trigger')
+      .dropdown({
+        'coverTrigger':false,
+        'alignment':"right"
+      });
       $('.tab').show();
     }
 
@@ -270,6 +296,133 @@ $(document).ready(function() {
 	document.getElementById('locationButton').click();
 
 });
+
+
+//function showing the notification page
+function showNotification() {
+  $("#monitoredContent").children().hide();
+  $("#notificationContainer").show();
+  $(".tab button").css("background-color","initial");
+}
+
+//function checking if there are new events that happenend concerning messages with warning or time spent on the phone
+function checkForNotification(){
+
+  $.when(fetchNotifications()).done(function(result){
+
+    if (result==null){
+      result=[];
+    }
+    else {
+      jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+      if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+        jq_obj = eval (jq_json_obj);
+
+        //Convert back to an array
+        jq_array = [];
+        for(elem in jq_obj){
+          jq_array.push(jq_obj[elem]);
+        }
+        result=jq_array;
+      }
+    }
+
+    addNotificationToHTML(result,false);
+    addNotificationToHTML(result,true);
+  });
+
+}
+
+
+function addNotificationToHTML(result,bool) {
+
+    if (bool) {
+      //ul for notification container
+      var ul=document.createElement("ul");
+      ul.setAttribute("class","collection");
+    }
+    else {
+      //ul for dropdown notification icon
+      var ul=document.getElementById("notification");
+    }
+
+    if (result.length==0){
+      $('#countOfNotification').html('Notification <span>(0)</span>');
+      var li=document.createElement("li");
+      var a=document.createElement("a");
+      var text=document.createTextNode("No new notification");
+      a.setAttribute("href","#!");
+      a.appendChild(text);
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+    else {
+      $('.notification-badge').css("background-color","#ff0000");
+      $('.notification-badge').html(result.length);
+      $('#linkNotification').attr("href","javascript:showNotification();");
+      $('#countOfNotification').html('Notification <span style="color:red;">('+result.length+')</span>');
+
+      for (var i=0;i<result.length;i++) {
+        var li_divider=document.createElement("li");
+        li_divider.setAttribute("class","divider");
+        li_divider.setAttribute("tabindex","-1");
+        var li=document.createElement("li");
+        var a=document.createElement("a");
+        var text=document.createTextNode(result[i][0]);
+
+        a.setAttribute("href","javascript:openTabs(null,'#"+result[i][1]+"')");
+
+        if (bool) {
+          li.setAttribute("class","collection-item avatar");
+          var span=document.createElement('span');
+          var t=document.createTextNode("New notification");
+          var p=document.createElement('p');
+          p.appendChild(text);
+          span.appendChild(t);
+          li.appendChild(span);
+          li.appendChild(p);
+          a.appendChild(li);
+          ul.appendChild(a);
+        }
+        else {
+          a.appendChild(text);
+          li.appendChild(a);
+          ul.appendChild(li);
+          ul.appendChild(li_divider);
+        }
+      }
+      if (bool) {
+        var div=document.getElementById('notificationContainer');
+        div.appendChild(ul);
+      }
+      else {
+        var liEnd=document.createElement("li");
+        var aEnd=document.createElement("a");
+        var textEnd=document.createTextNode("See all");
+        aEnd.appendChild(textEnd);
+        aEnd.setAttribute("id","seeMoreNotif");
+        aEnd.setAttribute("href","javascript:showNotification();");
+        liEnd.appendChild(aEnd);
+        ul.appendChild(liEnd);
+      }
+    }
+}
+
+//function fetching notification from server
+function fetchNotifications(){
+  return $.ajax({    //create an ajax request to display.php
+    type: "GET",
+    url: "fetch/checkNotifications.php",
+    dataType: "html",   //expect html to be returned
+    success: function(result){
+      return result;
+    },
+    error: function(){
+      return null;
+    }
+  });
+}
 
 //for contact list, fetch every contact
 function fetchContactList(){
@@ -552,7 +705,7 @@ function makeChart(data, detailedData){
   });
 }
 
-
+//for app usage, add table with stat to app usage page
 function addAppUsageDetailsToHTML(data,detailedData) {
 
   var total_time_in_apps=0;
@@ -891,6 +1044,11 @@ function addMessageToHTML(data){
     	newDiv.setAttribute("class","bubble recipient tooltipped");
       newDiv.setAttribute("data-position","left");
     }
+
+    //check if message raised a warning flag (bad words in the message)
+    if (row[3]==1){
+      newDiv.style.backgroundColor="#fb2a2a";
+    }
     newDiv.setAttribute("data-tooltip",row[2]);
     newDiv.appendChild(text);
     sec.appendChild(newDiv);
@@ -902,13 +1060,13 @@ function addMessageToHTML(data){
 }
 
 //Manage the nav bar containing the monitored information
-function openTabs(e,div,bool) {
-	$("#monitoredContent").children().hide();
-  $(div).show();
-  if (bool){
-    $("#mobile-demo button").css("background-color","initial");
+function openTabs(e,div) {
+  if (e==null) {
+    $(div).click();
   }
   else {
+    $("#monitoredContent").children().hide();
+    $(div).show();
     $(".tab button").css("background-color","initial");
     e.currentTarget.style="background-color: #ccc;";
   }
