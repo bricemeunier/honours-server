@@ -22,7 +22,7 @@ $datems=date_timestamp_get($date)*1000-259200000;
 $notif=[];
 $datetmp = date('m/d/Y');
 $today=date(date('m',strtotime($datetmp))."/".date('d',strtotime($datetmp))."/".date('Y',strtotime($datetmp)));
-$today=strtotime($today)*1000-3600000;
+$today=strtotime($today)*1000-7200000;
 
 
 if ($stmt = $con->prepare('select action,address,message,date from sms where idUser=? AND warning="1" AND date>? order by date desc')){
