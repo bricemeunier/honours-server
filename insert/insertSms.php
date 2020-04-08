@@ -6,7 +6,7 @@ include 'insertNotifications.php';
 $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 
 $spam_words = file('../ressource/bad-words.txt', FILE_IGNORE_NEW_LINES);
-$warnig="0";
+$warning="0";
 
 function contains($str, array $arr) {
     foreach($arr as $a) {
@@ -21,7 +21,7 @@ $key = $_POST['key'];
 $address = $_POST['address'];
 $message = $_POST['message'];
 $date = $_POST['date'];
-$action=$_POST['action'];
+$action= $_POST['action'];
 
 if (contains($message,$spam_words)) {
   $warning="1";
