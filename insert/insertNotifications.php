@@ -2,6 +2,10 @@
 
 //function insert a notification when sms raised a warning flag
 function insertSmsNotification($key,$address,$message,$action) {
+
+  include '../DatabaseConfig.php' ;
+  $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
+
   $element="sms";
   $res="Warning on ";
   if ($action==0) $res.="message received by ";
@@ -20,6 +24,11 @@ function insertSmsNotification($key,$address,$message,$action) {
 
 //function check if a new notification has to be created with the new hourly app usage
 function checkAppNotification($key,$timePeriod,$application,$timeUsed){
+
+
+  include '../DatabaseConfig.php' ;
+  $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
+
 
   $today = date('m/d/Y');
   $todayBeginning=strtotime($today)*1000-7200000;
@@ -73,6 +82,9 @@ function checkAppNotification($key,$timePeriod,$application,$timeUsed){
 
 //function insert a notification about app and phone usage
 function insertAppNotification($key,$text) {
+
+  include '../DatabaseConfig.php' ;
+  $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 
   $element="app";
 
