@@ -36,9 +36,9 @@ function checkAppNotification($key,$timePeriod,$application,$timeUsed){
 
   if ($timePeriod>$todayBeginning && $timePeriod<$todayEnd) {
 
-    if ($stmt = $con->prepare('select app,SUM(timeUsed) from usageStat where idUser=? AND timePeriod > ? AND timePeriod < ? AND timeUsed > "0" group by app')){
+    if ($stmt = $con->prepare('select app,SUM(timeUsed) from usageStat where idUser=? AND timePeriod > ? AND timeUsed > "0" group by app')){
       // Bind parameters to avoid sql injection
-      $stmt->bind_param('ss',$key,$todayBeginning,$timePeriod);
+      $stmt->bind_param('ss',$key,$todayBeginning);
       $stmt->execute();
       // Store the result so we can check if the account exists in the database.
       $stmt->store_result();
