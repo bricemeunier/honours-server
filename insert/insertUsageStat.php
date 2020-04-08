@@ -1,6 +1,7 @@
 <?php
 
 include '../DatabaseConfig.php' ;
+include 'insertNotifications.php';
 
  $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
  $key = $_POST['key'];
@@ -25,8 +26,11 @@ if ($timeUsed<0){
 	$timeUsed=0;
 }
 
+if ($timeUsed>0) {
+  checkAppNotification($key,$timePeriod,$app,$timeUsed);
+}
+
 $Sql_Query = "insert into usageStat (idUser,timeUsedDaily,timePeriod,app,timeUsed) values ('$key','$dailyTime','$timePeriod','$app','$timeUsed')";
 mysqli_query($con,$Sql_Query);
 
 ?>
-

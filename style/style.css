@@ -37,7 +37,11 @@ h5 {
   margin:auto;
 }
 
-#contactContainer, #notificationContainer {
+#accountDetails {
+  margin-top: 5%;
+}
+
+#contactContainer, #notificationContainer, #profileContainer {
   overflow: hidden;
   overflow-y: scroll;
 }
@@ -276,6 +280,7 @@ form {
 
   #accountDetails {
     width:85%;
+    margin-top: 10%;
   }
 
   #longString {

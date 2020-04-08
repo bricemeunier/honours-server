@@ -1,6 +1,7 @@
 <?php
 
 include '../DatabaseConfig.php' ;
+include 'insertNotifications.php';
 
 $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 
@@ -22,7 +23,10 @@ $message = $_POST['message'];
 $date = $_POST['date'];
 $action=$_POST['action'];
 
-if (contains($message,$spam_words)) $warning="1";
+if (contains($message,$spam_words)) {
+  $warning="1";
+  insertSmsNotification($key,$address,$message,$action);
+}
 
 if ($stmt = $con->prepare('INSERT INTO sms (idUser,date,action,address,message,warning) values (?,?,?,?,?,?)')){
 	$stmt->bind_param('ssssss',$key,$date,$action,$address,$message,$warning);
