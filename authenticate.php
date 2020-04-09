@@ -9,14 +9,14 @@ $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 if ( mysqli_connect_errno() ) {
 	// If there is an error with the connection, stop the script and display the error.
 	die ();
-	header('Location: index.html?error=0');
+	header('Location: login.php?error=0');
 }
 
 // Now we check if the data from the login form was submitted, isset() will check if the data exists.
 if ( !isset($_POST['username'], $_POST['password']) ) {
 	// Could not get the data that should have been sent.
 	die ();
-	header('Location: index.html?error=1');
+	header('Location: login.php?error=1');
 }
 
 // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
@@ -41,7 +41,7 @@ if ($stmt = $con->prepare('SELECT id, password,idUser,email FROM accounts WHERE 
 			$_SESSION['name'] = ucfirst($_POST['username']);
 			$_SESSION['id'] = $id;
 			$_SESSION['email']=$email;
-			header('Location: home.php');
+			header('Location: index.php');
 		}
 		else {
 			$verif=TRUE;
@@ -51,7 +51,7 @@ if ($stmt = $con->prepare('SELECT id, password,idUser,email FROM accounts WHERE 
 		$verif=TRUE;
 	}
 	if ($verif){
-		header('Location: index.html?error=1');
+		header('Location: login.php?error=1');
 	}
 }
 $con->close();

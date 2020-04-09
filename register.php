@@ -11,20 +11,20 @@ $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
 if (mysqli_connect_errno()) {
 	// If there is an error with the connection, stop the script and display the error.
 	die ();
-	header('Location: index.html?error=00');
+	header('Location: login.php?error=00');
 }
 
 // Now we check if the data was submitted, isset() function will check if the data exists.
 if (!isset($_POST['username'], $_POST['password'], $_POST['email'])) {
 	// Could not get the data that should have been sent.
 	die ();
-	header('Location: index.html?error=2');
+	header('Location: login.php?error=2');
 }
 // Make sure the submitted registration values are not empty.
 if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email'])) {
 	// One or more values are empty.
 	die ();
-	header('Location: index.html?error=2');
+	header('Location: login.php?error=2');
 }
 
 // We need to check if the account with that username exists.
@@ -36,7 +36,7 @@ if ($stmt = $con->prepare('SELECT id, password FROM accounts WHERE username = ?'
 	// Store the result so we can check if the account exists in the database.
 	if ($stmt->num_rows > 0) {
 		// Username already exists
-		header('Location: index.html?error=3');
+		header('Location: login.php?error=3');
 	}
 	else {
 		// Insert new account
@@ -47,18 +47,18 @@ if ($stmt = $con->prepare('SELECT id, password FROM accounts WHERE username = ?'
 			$id=sha1($_POST['username']);
 			$stmt->bind_param('ssss',$id, $_POST['username'], $password, $_POST['email']);
 			$stmt->execute();
-			header('Location: index.html?registration=1');
+			header('Location: login.php?registration=1');
 		}
 		else {
 			// Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
-			header('Location: index.html?error=0');
+			header('Location: login.php?error=0');
 		}
 	}
 	$stmt->close();
 }
 else {
 	// Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
-	header('Location: index.html?error=0');
+	header('Location: login.php?error=0');
 }
 
 $con->close();
