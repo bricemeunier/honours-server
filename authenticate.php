@@ -41,7 +41,7 @@ if ($stmt = $con->prepare('SELECT id, password,idUser,email FROM accounts WHERE 
 			$_SESSION['name'] = ucfirst($_POST['username']);
 			$_SESSION['id'] = $id;
 			$_SESSION['email']=$email;
-			header('Location: index.php');
+			header('Location: /');
 		}
 		else {
 			$verif=TRUE;
