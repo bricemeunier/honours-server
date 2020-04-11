@@ -1,22 +1,17 @@
 <?php
 
-include '../DatabaseConfig.php' ;
- echo $HostName;
+ include '../DatabaseConfig.php' ;
+
  $con = mysqli_connect($HostName,$HostUser,$HostPass,$DatabaseName);
+
  $key = $_POST['key'];
  $lat = $_POST['latitude'];
  $lon = $_POST['longitude'];
 
- $Sql_Query = "insert into location (idUser,lat,lon) values ('$key','$lat','$lon')";
-
- if($con->query($Sql_Query)){
-
- echo 'Data Submit Successfully';
-
+ if ($stmt = $con->prepare('INSERT INTO location (idUser,lat,lon) VALUES (?,?,?)')){
+ 	$stmt->bind_param('sss',$key,$lat,$lon);
+ 	$stmt->execute();
+  $stmt->close();
  }
- else{
 
- echo 'Try Again';
-
-}
 ?>
