@@ -76,16 +76,14 @@ $(document).ready(function() {
   var mm = today.getMonth()+1;
   var yyyy = today.getFullYear();
 
-  //redirect on click on mobile view
-  $("#smsButton-mobile").on('click',function() {
-    document.getElementById('smsButton').click();
-  });
-
   //sms page loading on click
   $("#smsButton").on('click',function() {
 
     //empty the two other divs
     $("#mapid").empty();
+    $("#contactContainer").empty();
+    $("#callLogsContainer").empty();
+    $("#appUsageDetails").empty();
     if(window.myChart != undefined) {
       window.myChart.destroy();
     }
@@ -96,17 +94,15 @@ $(document).ready(function() {
   	fetchSmsContact();
   });
 
-  //redirect on click on mobile view
-  $("#locationButton-mobile").on('click',function() {
-    document.getElementById('locationButton').click();
-  });
-
   //location page on click
   $("#locationButton").on('click',function() {
 
     //empty the two other divs
     $("#numberList").empty();
     $("#discussion").empty();
+    $("#contactContainer").empty();
+    $("#callLogsContainer").empty();
+    $("#appUsageDetails").empty();
     if(window.myChart != undefined) {
       window.myChart.destroy();
     }
@@ -128,18 +124,15 @@ $(document).ready(function() {
     });
   });
 
-  //redirect on click on mobile view
-  $("#appButton-mobile").on('click',function() {
-    document.getElementById('appButton').click();
-  });
-
   //app usage page on click
   $("#appButton").on('click',function() {
-
+    
     //empty the two other divs
     $("#mapid").empty();
     $("#numberList").empty();
     $("#discussion").empty();
+    $("#contactContainer").empty();
+    $("#callLogsContainer").empty();
     $("#appUsageDetails").empty();
     if (datePicker!=null){
       datePicker=null;
@@ -161,9 +154,20 @@ $(document).ready(function() {
 
   });
 
-  //redirect on click on mobile view
-  $("#contactButton-mobile").on('click',function() {
-    document.getElementById('contactButton').click();
+  //call logs page on click
+  $("#callButton").on('click', function() {
+    //empty other tabs
+    $("#mapid").empty();
+    $("#numberList").empty();
+    $("#discussion").empty();
+    $("#contactContainer").empty();
+    $("#callLogsContainer").empty();
+    $("#appUsageDetails").empty();
+    if(window.myChart != undefined) {
+      window.myChart.destroy();
+    }
+
+    fetchCallLogs();
   });
 
   //contact list page on click
@@ -173,6 +177,9 @@ $(document).ready(function() {
     $("#mapid").empty();
     $("#numberList").empty();
     $("#discussion").empty();
+    $("#callLogsContainer").empty();
+    $("#contactContainer").empty();
+    $("#appUsageDetails").empty();
     if(window.myChart != undefined) {
       window.myChart.destroy();
     }
@@ -355,6 +362,108 @@ function fetchNotifications(){
       return null;
     }
   });
+}
+
+//for call logs, fetch every call
+function fetchCallLogs(){
+
+  $.ajax({    //create an ajax request to display.php
+    type: "GET",
+    url: "fetch/retrieveCallLogs.php",
+    dataType: "html",   //expect html to be returned
+    success: function(result){
+      if (result!=undefined){
+        jq_json_obj = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+      	if(typeof jq_json_obj == 'object') { //Test if variable is a [JSON] object
+        	jq_obj = eval (jq_json_obj);
+
+        	//Convert back to an array
+        	jq_array = [];
+          listContact=[];
+          $.when(fetchContactList()).done(function(result){
+            if (result!=undefined){
+              jq_json_obj_1 = $.parseJSON(result); //Convert the JSON object to jQuery-compat$
+
+              if(typeof jq_json_obj_1 == 'object') { //Test if variable is a [JSON] object
+                jq_obj_1 = eval (jq_json_obj_1);
+
+                //Convert back to an array
+                jq_array_1 = [];
+                for(elem in jq_obj_1){
+                  jq_array_1.push(jq_obj_1[elem]);
+                }
+                listContact=jq_array_1;
+              }
+            }
+            if (listContact!=null){
+              for(elem in jq_obj){
+                for (var i=0;i<listContact.length;i++){
+                  if (jq_obj[elem][1][0]==listContact[i][1]) {
+                    jq_obj[elem][1][1]=listContact[i][0];
+                  }
+                }
+                jq_array.push(jq_obj[elem]);
+            	}
+           		addCallLogsToContactContainer(jq_array);
+            }
+          });
+      	}
+      }
+    },
+    error: function () {
+      addCallLogsToContactContainer(null);
+    }
+  });
+}
+
+//for call logs, add call logs to callLogsContainer
+function addCallLogsToContactContainer(list){
+  if (list==null){
+    $('#callLogsContainer').html("Error while fetching callLogs, please try again");
+  }
+  else {
+    var div=document.getElementById("callLogsContainer");
+    var t=document.createElement("table");
+    t.setAttribute("class","highlight");
+    var thead=document.createElement("thead");
+    var trhead=document.createElement("tr");
+    var thDate=document.createElement("th");
+    var thPhone=document.createElement("th");
+    var thDuration=document.createElement("th");
+    var thType=document.createElement("th");
+    thDate.append("Date");
+    thPhone.append("Phone");
+    thDuration.append("Duration");
+    thType.append("Type");
+    trhead.appendChild(thDate);
+    trhead.appendChild(thPhone);
+    trhead.appendChild(thDuration);
+    trhead.appendChild(thType);
+    thead.appendChild(trhead);
+    t.appendChild(thead);
+    var tbody=document.createElement("tbody");
+
+    for (var i=0;i<list.length;i++) {
+      var row=list[i];
+      var tr=document.createElement("tr");
+      var tdDate=document.createElement("td");
+      var tdPhone=document.createElement("td");
+      var tdDuration=document.createElement("td");
+      var tdType=document.createElement("td");
+      tdDate.append(row[0]);
+      if (row[1].length>1) tdPhone.append(row[1][1]);
+      else tdPhone.append(row[1][0]);
+      tdDuration.append(row[2]);
+      tdType.append(row[3]);
+      tr.appendChild(tdDate);
+      tr.appendChild(tdPhone);
+      tr.appendChild(tdDuration);
+      tr.appendChild(tdType);
+      tbody.appendChild(tr);
+    }
+    t.appendChild(tbody);
+    div.appendChild(t);
+  }
 }
 
 //for contact list, fetch every contact

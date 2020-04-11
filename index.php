@@ -43,6 +43,7 @@ if (!isset($_SESSION['loggedin'])) {
           <li id="locationButton-mobile"><a href="javascript:openTabs(null,'#locationButton');"><b>Location</b></a></li>
           <li id="smsButton-mobile"><a href="javascript:openTabs(null,'#smsButton');"><b>SMS</b></a></li>
           <li id="appButton-mobile"><a href="javascript:openTabs(null,'#appButton');"><b>App Usage</b></a></li>
+          <li id="callButton-mobile"><a href="javascript:openTabs(null,'#callButton');"><b>Call Logs</b></a></li>
           <li id="contactButton-mobile"><a href="javascript:openTabs(null,'#contactButton');"><b>Contact List</b></a></li>
           <li><a href="javascript:showProfileInfo();"><b>Profile</b></a></li>
           <li><a href="logout.php"><b>Logout</b></a></li>
@@ -61,6 +62,7 @@ if (!isset($_SESSION['loggedin'])) {
           <button id="locationButton" onclick="openTabs(event,'#locationContainer')">Location</button>
           <button id="smsButton" onclick="openTabs(event,'#smsContainer')">SMS</button>
           <button id="appButton" onclick="openTabs(event,'#appUsageContainer')">App Usage</button>
+          <button id="callButton" onclick="openTabs(event,'#callLogsContainer')">Call Logs</button>
           <button id="contactButton" onclick="openTabs(event,'#contactContainer')">Contact List</button>
     		</div>
         <div id="monitoredContent">
@@ -96,6 +98,7 @@ if (!isset($_SESSION['loggedin'])) {
             <div id="appUsageDetails"></div>
           </div>
 
+          <div id="callLogsContainer"></div>
           <div id="contactContainer"></div>
           <div id="notificationContainer"></div>
           <div id="profileContainer">

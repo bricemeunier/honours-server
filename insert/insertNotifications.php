@@ -76,6 +76,7 @@ function checkAppNotification($key,$timePeriod,$application,$timeUsed){
           insertAppNotification($key,$res);
         }
       }
+      $stmt->close();
     }
   }
 }

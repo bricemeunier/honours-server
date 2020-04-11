@@ -37,11 +37,16 @@ h5 {
   margin:auto;
 }
 
+#callLogsContainer {
+  width:70%;
+  margin:auto;
+}
+
 #accountDetails {
   margin-top: 5%;
 }
 
-#contactContainer, #notificationContainer, #profileContainer {
+#contactContainer, #notificationContainer, #profileContainer, #callLogsContainer {
   overflow: hidden;
   overflow-y: scroll;
 }
@@ -307,5 +312,10 @@ form {
 
   #appUsageDetails {
     width:70%;
+  }
+
+  #callLogsContainer {
+    width:98%;
+    margin:auto;
   }
 }
