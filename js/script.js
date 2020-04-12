@@ -110,7 +110,7 @@ $(document).ready(function() {
     datePicker=$("#selectDate").height();
     $("#mapid").height(moni-datePicker-(moni*0.01)-5);
     //set value to datepicker
-    getLocationFromDate(new Date(yyyy+"/"+"0"+mm+"/"+dd).getTime());
+    getLocationFromDate(new Date(yyyy+"/"+mm+"/"+dd).getTime());
     document.getElementsByClassName("locationDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
 
     //set datepicker
@@ -126,7 +126,7 @@ $(document).ready(function() {
 
   //app usage page on click
   $("#appButton").on('click',function() {
-    
+
     //empty the two other divs
     $("#mapid").empty();
     $("#numberList").empty();
@@ -139,7 +139,7 @@ $(document).ready(function() {
     }
 
     //set value to datepicker
-    getAppUsageFromDate(new Date(yyyy+"/"+"0"+mm+"/"+dd).getTime());
+    getAppUsageFromDate(new Date(yyyy+"/"+mm+"/"+dd).getTime());
     document.getElementsByClassName("appUsageDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
 
     //set datepicker
