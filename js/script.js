@@ -139,7 +139,7 @@ $(document).ready(function() {
     }
 
     //set value to datepicker
-    getAppUsageFromDate(new Date(yyyy+"-"+"0"+mm+"-"+dd).getTime());
+    getAppUsageFromDate(new Date(yyyy+"/"+"0"+mm+"/"+dd).getTime());
     document.getElementsByClassName("appUsageDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
 
     //set datepicker
