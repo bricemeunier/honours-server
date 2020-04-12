@@ -139,7 +139,7 @@ $(document).ready(function() {
     }
 
     //set value to datepicker
-    getAppUsageFromDate(new Date(yyyy+"/"+mm+"/"+dd).getTime()-3600000);
+    getAppUsageFromDate(new Date(yyyy+"/"+mm+"/"+dd).getTime()+3600000);
     document.getElementsByClassName("appUsageDatepicker")[0].value=yyyy+"/"+"0"+mm+"/"+dd;
 
     //set datepicker
@@ -148,7 +148,7 @@ $(document).ready(function() {
         autoClose: true,
         onSelect : function(time){
           var dt=new Date(time);
-          getAppUsageFromDate(dt.getTime()-3600000);
+          getAppUsageFromDate(dt.getTime()+3600000);
         }
     });
 
