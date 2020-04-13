@@ -1,5 +1,4 @@
 <?php
-
 //function insert a notification when sms raised a warning flag
 function insertSmsNotification($key,$address,$message,$action) {
 
@@ -31,8 +30,8 @@ function checkAppNotification($key,$timePeriod,$application,$timeUsed){
 
 
   $today = date('m/d/Y');
-  $todayBeginning=strtotime($today)*1000-7200000;
-  $todayEnd=strtotime($today)*1000+86399999;
+  $todayBeginning=strtotime($today)*1000-1;
+  $todayEnd=strtotime($today)*1000+86400000;
 
   if ($timePeriod>$todayBeginning && $timePeriod<$todayEnd) {
 
