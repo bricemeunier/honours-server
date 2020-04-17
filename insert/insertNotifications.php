@@ -61,16 +61,16 @@ function checkAppNotification($key,$timePeriod,$application,$timeUsed){
 
         if (floor($total_time/3600)<floor(($total_time+$timeUsed)/3600)) {
           $total_time=floor(($total_time+$timeUsed)/3600);
-          if ($total_time>1) $res="The phone has been used more than ".$total_time." hours today";
-          else $res="The phone has been used more than ".$total_time." hour today";
+          if ($total_time>1) $res="Daily alert: The phone has been used more than ".$total_time." hours";
+          else $res="Daily alert: The phone has been used more than ".$total_time." hour";
 
           insertAppNotification($key,$res);
         }
 
         if (floor($total_app_time/1800) < floor(($total_app_time+$timeUsed)/1800) && floor($total_app_time/1800)<2){
           $total_app_time=floor(($total_app_time+$timeUsed)/1800);
-          if ($total_app_time==1) $res=$app." has been used more than 30 minutes today";
-          else $res=$app." has been used more than 1 hour today";
+          if ($total_app_time==1) $res="Daily alert: ".$application." has been used more than 30 minutes";
+          else $res="Daily alert: ".$application." has been used more than 1 hour";
 
           insertAppNotification($key,$res);
         }
