@@ -5,8 +5,7 @@ The purpose of this project is to monitor a smartphone.
 This repository is useful only if you want to host the website and database on your own server. 
 Otherwise just follow the ReadMe file of the application's repository
 
-You can download the Android application on this repository
-https://github.com/bricemeunier/Honours
+You can download the Android application on this [repository](https://github.com/bricemeunier/Honours)
 
 ## LEGAL WARNING
 IT IS ILLEGAL TO USE THIS SOFTWARE TO MONITOR THE PHONE OF SOMEONE YOU ARE NOT RESPONSIBLE FOR!
