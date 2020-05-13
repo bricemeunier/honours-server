@@ -27,6 +27,9 @@ if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['emai
 	header('Location: login.php?error=2');
 }
 
+$_POST['username']=htmlspecialchars($_POST['username'],ENT_QUOTES,'UTF-8');
+$_POST['email']=htmlspecialchars($_POST['email'],ENT_QUOTES,'UTF-8');
+
 // We need to check if the account with that username exists.
 if ($stmt = $con->prepare('SELECT id, password FROM accounts WHERE username = ?')) {
 	// Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
