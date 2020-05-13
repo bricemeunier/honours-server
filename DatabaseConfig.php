@@ -4,10 +4,10 @@
 $HostName = "localhost";
 
 //Define your database username here.
-$HostUser = "root";
+$HostUser = "----INSERT YOUR DB USER HERE---";
 
 //Define your database password here.
-$HostPass = "jE9!7aGUio0;";
+$HostPass = "----INSERT YOUR DB PASSWORD HERE---";
 
 //Define your database name here.
 $DatabaseName = "honours";
